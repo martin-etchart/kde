@@ -1,0 +1,11 @@
+# Solución en página.
+#
+#!/bin/bash
+
+OBJ = test_kde.o
+ 
+test_kde : $(OBJ)
+	gcc -std=c99 -g $(OBJ) -o $@ -lm
+ 
+%.o: %.c
+	gcc -std=c99 -c $^
