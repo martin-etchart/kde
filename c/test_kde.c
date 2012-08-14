@@ -1,7 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <complex.h>
+
 #include <gsl/gsl_histogram.h>
+
+#include <gsl/gsl_fft_real.h>
+#include <gsl/gsl_fft_halfcomplex.h>
 
 int verbose = -1;
 
@@ -82,10 +87,94 @@ int histc(double *data, double *xmesh, int n , double *bins){
 	gsl_histogram_fprintf (stdout, h, "%g", "%g");
 	/*...*/
 
-	//gsl_histogram_free(h);
+	gsl_histogram_free(h);
 
 	return 0;
 }
+
+int fft(double *data, int length, double complex *fft_data){
+
+	gsl_fft_real_radix2_transform (data, 1, length);
+
+	return 0;
+}
+
+int ifft(double *data, int length, double *ifft_data){
+
+
+	gsl_fft_halfcomplex_radix2_inverse (data, 1, length);
+
+	return 0;
+}
+
+int dct1d(double *data, int length, double *dct_data){
+/*	% computes the discrete cosine transform of the column vector data
+	[nrows,ncols]= size(data);
+	% Compute weights to multiply DFT coefficients
+	weight = [1;2*(exp(-i*(1:nrows-1)*pi/(2*nrows))).'];
+	% Re-order the elements of the columns of x
+	data = [ data(1:2:end,:); data(end:-2:2,:) ];
+	% Multiply FFT by weights:
+	data= real(weight.* fft(data));
+*/
+	/*Compute weights to multiply DFT coefficients*/
+	double complex weight[length];
+	weight[0] = 1;
+	for (int i=1;i<length;i++)
+		weight[i] = 2*(cexp(-I*i*M_PI/(2*length)));
+
+	/*Re-order the elements of the columns of x*/
+	double data_aux[length/2];
+	for(int i=0, j=length-1 ; j>=2 ; i++, j-=2 )
+		data_aux[i] = data[j];
+
+	/*Multiply FFT by weights*/
+	double complex fft_data[length];
+	fft(data, length, fft_data);
+	for (int i=0;i<length;i++)
+		dct_data[i] = creal(weight[i]*fft_data[i]);
+
+	return 0;
+}
+
+int idct1d(double *data, double *dct){
+/*	% computes the inverse discrete cosine transform
+	[nrows,ncols]=size(data);
+	% Compute weights
+	weights = nrows*exp(i*(0:nrows-1)*pi/(2*nrows)).';
+	% Compute x tilde using equation (5.93) in Jain
+	data = real(ifft(weights.*data));
+	% Re-order elements of each column according to equations (5.93) and
+	% (5.94) in Jain
+	out = zeros(nrows,1);
+	out(1:2:nrows) = data(1:nrows/2);
+	out(2:2:nrows) = data(nrows:-1:nrows/2+1);
+	%   Reference:
+	%      A. K. Jain, "Fundamentals of Digital Image
+	%      Processing", pp. 150-153.
+*/
+
+	return 0;
+}
+
+int fixed_point(double t, int N, double *It, double *a2){
+/*	function  out=fixed_point(t,N,I,a2)
+	% this implements the function t-zeta*gamma^[l](t)
+	l=7;
+	f=2*pi^(2*l)*sum(I.^l.*a2.*exp(-I*pi^2*t));
+	for s=l-1:-1:2
+		K0=prod([1:2:2*s-1])/sqrt(2*pi);  const=(1+(1/2)^(s+1/2))/3;
+		time=(2*const*K0/N/f)^(2/(3+2*s));
+		f=2*pi^(2*s)*sum(I.^s.*a2.*exp(-I*pi^2*time));
+	end
+	out=t-(2*N*sqrt(pi)*f)^(-2/5);
+	end
+*/
+
+	return 0;
+}
+
+
 
 void kde(double *data, int length, int n ,double dataMIN, double dataMAX)
 {
@@ -114,22 +203,29 @@ void kde(double *data, int length, int n ,double dataMIN, double dataMAX)
 	double xmesh[n];
 	for (int i=0; i<n; i++ ) xmesh[i] = dataMIN+i*dx;
 
-	//...double N=length(unique(data));
-	//qsort(data, length, sizeof(double), compare_doubles);
+	double N = length; //double N=length(unique(data)); //qsort(data, length, sizeof(double), compare_doubles);
 	
 	/*bin the data uniformly using the grid defined above;*/
 	double initial_data[n];
-
-	printf("a\n");
 	histc(data, xmesh, n , initial_data);
-	printf("b\n");
-//	initial_data=histc(data,xmesh)/N;  
-//	initial_data=initial_data/sum(initial_data);
+	double sum_initial_data = 0;
+	for(int i=0;i<length;i++){
+		initial_data[i]=initial_data[i]/N;
+		sum_initial_data+=initial_data[i];
+	}
+	for(int i=0;i<length;i++)
+		initial_data[i]=initial_data[i]/sum_initial_data;
+
+	double a[n-1];
 //	a=dct1d(initial_data); // discrete cosine transform of initial data
 	
 	/*now compute the optimal bandwidth^2 using the referenced method*/
-//	I=[1:n-1]'.^2; 
-//	a2=(a(2:end)/2).^2;
+	double It[n-1];
+	for (int i=0;i<n-1;i++)
+		It[i]=pow(i+1,2);
+	double a2[n-1];
+	for(int i=0;i<n-1;i++)
+		a2[i] = pow(a[i+1]/2,2);
 	
 	/*use  fzero to solve the equation t=zeta*gamma^[5](t)*/
 /*	try
@@ -159,7 +255,7 @@ int main( int argc, char** argv )
 
 	int length = 300;
 	double data[length];
-	const char * full_fname = "/home/roho/workspace/juanc/matlab/matlab/kde/data.txt";
+	const char * full_fname = "../matlab/data.txt";
 	
 	file_read_into_array_doubles(full_fname, data, &length);
 	
