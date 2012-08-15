@@ -137,7 +137,7 @@ int dct1d(double *data, int length, double *dct_data){
 	return 0;
 }
 
-int idct1d(double *data, double *dct){
+int idct1d(double *data, int length, double *dct_data){
 /*	% computes the inverse discrete cosine transform
 	[nrows,ncols]=size(data);
 	% Compute weights
@@ -153,6 +153,28 @@ int idct1d(double *data, double *dct){
 	%      A. K. Jain, "Fundamentals of Digital Image
 	%      Processing", pp. 150-153.
 */
+
+	/*Compute weights*/
+	double complex weight[length];
+	for (int i=0;i<length;i++)
+		weight[i] = length*(cexp(I*i*M_PI/(2*length)));
+
+	/*Compute weighted data*/
+	for (int i=0;i<length;i++)
+		data[i] = data[i]*weight[i];
+
+	/*get IFFT of weighted data*/
+	double complex ifft_data[length];
+	ifft(data, length, ifft_data);
+
+	/*Compute x tilde using equation (5.93) in Jain*/
+	for (int i=0;i<length;i++)
+		dct_data[i] = creal(ifft_data[i]);
+
+	/*Re-order elements of each column according to equations (5.93) and (5.94) in Jain*/
+	//out = zeros(nrows,1);
+	//out(1:2:nrows) = data(1:nrows/2);
+	//out(2:2:nrows) = data(nrows:-1:nrows/2+1);
 
 	return 0;
 }
