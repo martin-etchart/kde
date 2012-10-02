@@ -54,6 +54,9 @@ initial_data=histc(data,xmesh)/N;  initial_data=initial_data/sum(initial_data);
 a=dct1d(initial_data); % discrete cosine transform of initial data
 % now compute the optimal bandwidth^2 using the referenced method
 I=[1:n-1]'.^2; a2=(a(2:end)/2).^2;
+
+keyboard
+
 % use  fzero to solve the equation t=zeta*gamma^[5](t)
 try
     t_star=fzero(@(t)fixed_point(t,N,I,a2),[0,.1]);
