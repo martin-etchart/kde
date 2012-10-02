@@ -1,4 +1,4 @@
-function [bandwidth,density,xmesh,cdf]=kde(data,n,MIN,MAX)
+function [bandwidth,density,xmesh,cdf]=kde2(data,n,MIN,MAX)
 % Reliable and extremely fast kernel density estimator for one-dimensional data;
 %        Gaussian kernel is assumed and the bandwidth is chosen automatically;
 %        Unlike many other implementations, this one is immune to problems
@@ -51,7 +51,7 @@ end
 R=MAX-MIN; dx=R/(n-1); xmesh=MIN+[0:dx:R]; N=length(unique(data));
 %bin the data uniformly using the grid defined above;
 initial_data=histc(data,xmesh)/N;  initial_data=initial_data/sum(initial_data);
-a=dct1d(initial_data); % discrete cosine transform of initial data
+a=kde_dct1d(initial_data); % discrete cosine transform of initial data
 % now compute the optimal bandwidth^2 using the referenced method
 I=[1:n-1]'.^2; a2=(a(2:end)/2).^2;
 
@@ -67,7 +67,7 @@ end
 a_t=a.*exp(-[0:n-1]'.^2*pi^2*t_star/2);
 % now apply the inverse discrete cosine transform
 if (nargout>1)|(nargout==0)
-    density=idct1d(a_t)/R;
+    density=kde_idct1d(a_t)/R;
 end
 % take the rescaling of the data into account
 bandwidth=sqrt(t_star)*R;
@@ -80,7 +80,7 @@ if nargout>3
     t_cdf=(sqrt(pi)*f*N)^(-2/3);
     % now get values of cdf on grid points using IDCT and cumsum function
     a_cdf=a.*exp(-[0:n-1]'.^2*pi^2*t_cdf/2);
-    cdf=cumsum(idct1d(a_cdf))*(dx/R);
+    cdf=cumsum(kde_idct1d(a_cdf))*(dx/R);
     % take the rescaling into account if the bandwidth value is required
     bandwidth_cdf=sqrt(t_cdf)*R;
 end
@@ -100,36 +100,9 @@ out=t-(2*N*sqrt(pi)*f)^(-2/5);
 end
 
 
-%##############################################################
-function out = idct1d(data)
 
-% computes the inverse discrete cosine transform
-[nrows,ncols]=size(data);
-% Compute weights
-weights = nrows*exp(i*(0:nrows-1)*pi/(2*nrows)).';
-% Compute x tilde using equation (5.93) in Jain
-data = real(ifft(weights.*data));
-% Re-order elements of each column according to equations (5.93) and
-% (5.94) in Jain
-out = zeros(nrows,1);
-out(1:2:nrows) = data(1:nrows/2);
-out(2:2:nrows) = data(nrows:-1:nrows/2+1);
-%   Reference:
-%      A. K. Jain, "Fundamentals of Digital Image
-%      Processing", pp. 150-153.
-end
-%##############################################################
 
-function data=dct1d(data)
-% computes the discrete cosine transform of the column vector data
-[nrows,ncols]= size(data);
-% Compute weights to multiply DFT coefficients
-weight = [1;2*(exp(-i*(1:nrows-1)*pi/(2*nrows))).'];
-% Re-order the elements of the columns of x
-data = [ data(1:2:end,:); data(end:-2:2,:) ];
-% Multiply FFT by weights:
-data= real(weight.* fft(data));
-end
+
 
 
 
