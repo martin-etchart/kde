@@ -3,6 +3,17 @@
 
 #define N 3
 
+void print_v(double* v, int n, char* title)
+{
+printf("%s:", title);
+
+for(int i = 0; i < n; i++)
+{
+printf(" %g", v[i]);
+}
+printf("\n");
+}
+
 int main(int argc, char** argv)
 {
 
@@ -25,18 +36,10 @@ for(int i = 0; i < 3; i++)
  in2[i]/=2*n;
 
 
-for(int i = 0; i < 3; i++)
-{
-printf(" %g", out[i]);
-}
-printf("\n");
+print_v(in,N,"in");
+print_v(in2,N,"in2");
+print_v(out,N,"out");
 
-
-for(int i = 0; i < 3; i++)
-{
-printf(" %g", in2[i]);
-}
-printf("\n");
 
 
 fftw_destroy_plan(idct);

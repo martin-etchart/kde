@@ -10,6 +10,29 @@
 
 int verbose = -1;
 
+#define VERBOSE
+#ifdef VERBOSE
+#define xml_out(...) fprintf ( stdout , __VA_ARGS__ )
+#else
+#define xml_out(...) 
+#endif
+
+#define XML_IN xml_out("<%s>\n",  __FUNCTION__)
+#define XML_IN_T(str) xml_out("<%s title=\"%s\">\n", __FUNCTION__ , str)
+#define XML_OUT xml_out("</%s>\n", __FUNCTION__)
+
+
+int print_vec(double *v, char* title, int start, int end)
+{
+XML_IN_T(title);
+//printf("%s: ",title);
+for(int i=start;i<end;i++)
+printf(" %g",v[i]);
+printf("\n");
+XML_OUT;
+}
+
+
 int file_read_into_array_doubles(const char *filename , double *data, int *length)
 {
     FILE *in_file;
@@ -71,6 +94,9 @@ int histc(double *data, double *xmesh, int n , double *bins){
 	printf("0\n");
 
 	gsl_histogram_set_ranges (h, xmesh, n);
+	
+	double h_max = gsl_histogram_max(h);
+	double h_min = gsl_histogram_min(h);
 
 	printf("1\n");
 
@@ -79,7 +105,7 @@ int histc(double *data, double *xmesh, int n , double *bins){
 
 	printf("2\n");
 
-	for (int i=0;i<300;i++)
+	for (int i=0;i<n-1;i++)
 		bins[i] = gsl_histogram_get (h, i);
 
 	printf("3\n");
@@ -231,15 +257,15 @@ void kde(double *data, int length, int n ,double dataMIN, double dataMAX)
 	double initial_data[n];
 	histc(data, xmesh, n , initial_data);
 	double sum_initial_data = 0;
-	for(int i=0;i<length;i++){
+	for(int i=0;i<n;i++){
 		initial_data[i]=initial_data[i]/N;
 		sum_initial_data+=initial_data[i];
 	}
-	for(int i=0;i<length;i++)
+	for(int i=0;i<n;i++)
 		initial_data[i]=initial_data[i]/sum_initial_data;
 
-	double a[n-1];
-//	a=dct1d(initial_data); // discrete cosine transform of initial data
+	double a[n];
+	dct1d(initial_data,n,a); // discrete cosine transform of initial data
 	
 	/*now compute the optimal bandwidth^2 using the referenced method*/
 	double It[n-1];
@@ -263,9 +289,9 @@ void kde(double *data, int length, int n ,double dataMIN, double dataMAX)
 	
 	if  (verbose==3 || verbose==-1)
 	{
-	for (int i=1700; i<2000 ; i++ )
-		//printf("%f\n",xmesh[i]);
-		printf("%f\n",initial_data[i]);
+		print_vec(xmesh,"xmesh",0,128);
+		print_vec(initial_data,"initial_data",0,128);
+		print_vec(a,"a",0,128);
 	}
 
 	
@@ -274,7 +300,7 @@ void kde(double *data, int length, int n ,double dataMIN, double dataMAX)
 
 int main( int argc, char** argv )
 {
-
+XML_IN;
 	int length = 300;
 	double data[length];
 	const char * full_fname = "../matlab/data.txt";
@@ -288,12 +314,13 @@ int main( int argc, char** argv )
 	
 	double maximum, minimum;
 	find_max_min_array_doubles(data,length,&maximum,&minimum);
-	kde(data,length,pow(2,14),minimum-5,maximum+5);
+	//kde(data,length,pow(2,14),minimum-5,maximum+5);
+	kde(data,length,128,minimum-5,maximum+5);
 	
 	if (verbose==1 || verbose==-1)
 	{
 		//printf("---DATA---\n"); for (int i=0; i<300; i++) printf("%f\n",data[i]);
 	}
-
+XML_OUT;
 	return 0;
 }

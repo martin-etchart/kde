@@ -18,7 +18,7 @@ end
 [h,x]=hist(data,256);
 dx=x(2)-x(1);
 h=h/sum(h*dx);
-[bw,f,xi,v_cdf]=kde2(data,512,min(data)-5,max(data)+5);
+[bw,f,xi,v_cdf]=kde2(data,128,min(data)-5,max(data)+5);
 
 
 figure(1)
