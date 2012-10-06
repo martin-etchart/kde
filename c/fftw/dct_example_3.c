@@ -37,8 +37,8 @@ for(int i = 0; i < 3; i++)
 
 
 print_v(in,N,"in");
-print_v(in2,N,"in2");
 print_v(out,N,"out");
+print_v(in2,N,"in2");
 
 
 
