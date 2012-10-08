@@ -9,8 +9,7 @@ if 0
 	
 	save('data','data')
 	
-	fid = fopen('data.txt','w'); fprintf(fid,'%2.16f\n',data);
-	fclose(fid);
+	jfc_vector_save_simple(data,'data.txt');
 else
 	load('data.mat');
 end

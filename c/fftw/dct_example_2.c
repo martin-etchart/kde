@@ -2,7 +2,7 @@
 #include <math.h>
 #include "fftw3.h"
 
-#define N 3
+#define N 5
 
 void print_v(double* v, int n, char* title)
 {
@@ -19,10 +19,10 @@ int main(int argc, char** argv)
 {
 	int n=N;
 
-	double in[N]={2.0,1.0,0.0};
+	double in[N]={0.0545,    0.2442,    0.4026,    0.2442,    0.0545};
 	double out[N],in_n[N], in2[N],in2_n[N];
 
-	fftw_plan idct =	fftw_plan_r2r_1d(N, in_n, out, FFTW_REDFT01,
+	fftw_plan idct =	fftw_plan_r2r_1d(N, in, out, FFTW_REDFT01,
 			FFTW_MEASURE);
 	fftw_plan dct =	fftw_plan_r2r_1d(N, out, in2, FFTW_REDFT10,
 			FFTW_MEASURE);

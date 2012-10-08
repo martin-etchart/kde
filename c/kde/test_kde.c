@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <malloc/malloc.h>
 #include <complex.h>
 
 #include <gsl/gsl_histogram.h>
@@ -32,8 +33,35 @@ printf("\n");
 XML_OUT;
 }
 
+int file_read_into_array_doubles(const char *filename , double **out_data, int *length)
+{
+    FILE *in_file;
+    in_file = fopen(filename, "r");
+	 double *data=NULL;
 
-int file_read_into_array_doubles(const char *filename , double *data, int *length)
+    if (in_file == NULL)
+    {
+        return -1;
+    }
+    else
+    {
+		 fscanf(in_file, "%d", length);
+		 printf("length: %d\n", *length);
+		 data =(double*)malloc((*length)*sizeof(*data));
+
+        for(int j=0; j<*length; j++)
+        {
+            fscanf(in_file, "%lg", data+j);
+        }
+        fclose(in_file);
+		  *out_data=data;
+    }
+    return 0;
+}
+
+
+
+int file_read_into_array_doubles_l(const char *filename , double *data, int *length)
 {
     FILE *in_file;
     in_file = fopen(filename, "r");
@@ -301,15 +329,15 @@ void kde(double *data, int length, int n ,double dataMIN, double dataMAX)
 int main( int argc, char** argv )
 {
 XML_IN;
-	int length = 300;
-	double data[length];
-	const char * full_fname = "../matlab/data.txt";
+	unsigned int length=0;
+	double *data=NULL;
+	const char * full_fname = "../../../matlab/data.txt";
 	
-	file_read_into_array_doubles(full_fname, data, &length);
+	file_read_into_array_doubles(full_fname, &data, &length);
 	
 	if  (verbose==1 || verbose==-1)
 	{
-		//printf("---DATA---\n"); for (int i=0; i<300; i++) printf("%f\n",data[i]);
+	print_vec(data,"data",0,length);
 	}
 	
 	double maximum, minimum;
@@ -321,6 +349,7 @@ XML_IN;
 	{
 		//printf("---DATA---\n"); for (int i=0; i<300; i++) printf("%f\n",data[i]);
 	}
+	free(data);
 XML_OUT;
 	return 0;
 }

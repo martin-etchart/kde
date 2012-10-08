@@ -16,7 +16,7 @@ set(LIBS ${FFTW3_LIBRARIES})
 ENDIF(FFTW3_FOUND)
 
 SET( EXAMPLE_LIST
-a dct_example dct_example_3
+dct_example dct_example_2 dct_example_3
  )
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC -std=c99")

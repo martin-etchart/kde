@@ -1,0 +1,56 @@
+\documentclass[11pt]{report}
+
+% paquetes
+\usepackage{ucs}
+\usepackage[latin1,utf8x]{inputenc}
+\usepackage[english]{babel}
+\usepackage[none]{hyphenat}
+\usepackage{graphics}
+\usepackage{graphicx}
+\usepackage[pdftex]{hyperref}
+\usepackage[tight,scriptsize]{subfigure}
+
+%\usepackage{jfc}
+
+\hypersetup{bookmarks=true,hypertexnames, plainpages=false,colorlinks=true}
+
+% t\'{\i}tulos
+\title{Notes on histogram smoothing}
+\author{Juan Cardelino}
+% \email[Juan Cardelino]{juanc@fing.edu.uy}
+\date{\today}
+
+\if@twoside                 % Values for two-sided printing:
+\oddsidemargin 0.7cm     %   Left margin on odd-numbered pages.
+\evensidemargin 0.12cm    %   Left margin on even-numbered pages.
+\marginparwidth 40pt     %   Width of marginal notes.
+\else                       % Values for one-sided printing:
+\oddsidemargin 0.35in    %   Note that \oddsidemargin = \evensidemargin
+\evensidemargin 0.35in
+\marginparwidth 40pt
+\fi
+\marginparsep 10pt          % Horizontal space between outer margin and
+% marginal note
+\textwidth 16cm            % width of text
+
+%\usepackage{thesis}
+% \hyperbaseurl{http://iie.fing.edu.uy/~juanc/work/reporte/inf4}
+% \hyperbaseurl{http://iie.fing.edu.uy/rosaluna/juanc/work/reporte/inf4/}
+\hyperbaseurl{file:///discos/data1/juanc/publications/reports/tmaps}
+
+\begin{document}
+\maketitle
+The matlab implementation of the dct in the kde function does not work for $n_bins<128$
+
+
+
+\cleardoublepage
+
+ 
+
+% \cleardoublepage
+% \section{Referencias}
+%\bibliographystyle{unsrt}
+%\bibliography{references}
+
+\end{document}
