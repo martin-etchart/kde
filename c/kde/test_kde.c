@@ -3,62 +3,12 @@
 #include <math.h>
 #include <malloc/malloc.h>
 #include <complex.h>
-
 #include <gsl/gsl_histogram.h>
-
 #include <gsl/gsl_fft_real.h>
 #include <gsl/gsl_fft_halfcomplex.h>
+#include "kde_util.h"
 
 int verbose = -1;
-
-#define VERBOSE
-#ifdef VERBOSE
-#define xml_out(...) fprintf ( stdout , __VA_ARGS__ )
-#else
-#define xml_out(...) 
-#endif
-
-#define XML_IN xml_out("<%s>\n",  __FUNCTION__)
-#define XML_IN_T(str) xml_out("<%s title=\"%s\">\n", __FUNCTION__ , str)
-#define XML_OUT xml_out("</%s>\n", __FUNCTION__)
-
-
-int print_vec(double *v, char* title, int start, int end)
-{
-XML_IN_T(title);
-//printf("%s: ",title);
-for(int i=start;i<end;i++)
-printf(" %g",v[i]);
-printf("\n");
-XML_OUT;
-}
-
-int file_read_into_array_doubles(const char *filename , double **out_data, int *length)
-{
-    FILE *in_file;
-    in_file = fopen(filename, "r");
-	 double *data=NULL;
-
-    if (in_file == NULL)
-    {
-        return -1;
-    }
-    else
-    {
-		 fscanf(in_file, "%d", length);
-		 printf("length: %d\n", *length);
-		 data =(double*)malloc((*length)*sizeof(*data));
-
-        for(int j=0; j<*length; j++)
-        {
-            fscanf(in_file, "%lg", data+j);
-        }
-        fclose(in_file);
-		  *out_data=data;
-    }
-    return 0;
-}
-
 
 
 int file_read_into_array_doubles_l(const char *filename , double *data, int *length)
@@ -329,7 +279,7 @@ void kde(double *data, int length, int n ,double dataMIN, double dataMAX)
 int main( int argc, char** argv )
 {
 XML_IN;
-	unsigned int length=0;
+	int length=0;
 	double *data=NULL;
 	const char * full_fname = "../../../matlab/data.txt";
 	

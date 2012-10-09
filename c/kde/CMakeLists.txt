@@ -16,14 +16,29 @@ set(LIBS ${FFTW3_LIBRARIES})
 ENDIF(FFTW3_FOUND)
 
 SET( EXAMPLE_LIST
-test_kde
+test_kde test_kde_dct 
  )
+
+
+SET( OBJ_LIST_TMP
+kde_util 
+ )
+ 
+SET(OBJ_LIST )
+
+foreach (o ${OBJ_LIST_TMP})
+    MESSAGE( STATUS "o: " ${o})
+    SET(OBJ_LIST ${OBJ_LIST} ${o}.c )
+endforeach()
+
+MESSAGE( STATUS "obj_list: " ${OBJ_LIST})
+
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC -std=c99")
 
 FOREACH( var ${EXAMPLE_LIST} )
-  ADD_EXECUTABLE( ${var} ${var}.c )
-  TARGET_LINK_LIBRARIES( ${var} ${LIBS} -lgsl -lgslcblas)
+  ADD_EXECUTABLE( ${var} ${var}.c ${OBJ_LIST})
+  TARGET_LINK_LIBRARIES( ${var}  ${LIBS} -lgsl -lgslcblas)
 ENDFOREACH( var )
 
 
