@@ -63,7 +63,8 @@ int compare_doubles (const void *a, const void *b)
 
 double log2(double x) {	return (log(x) / log(2.0)); }
 
-int histc(double *data, double *xmesh, int n , double *bins){
+int histc(double *data, double *xmesh, int n , double *bins)
+{
 
 	printf("-1\n");
 
@@ -96,14 +97,16 @@ int histc(double *data, double *xmesh, int n , double *bins){
 	return 0;
 }
 
-int fft(double *data, int length, double complex *fft_data){
+int fft(double *data, int length, double complex *fft_data)
+{
 
 	gsl_fft_real_radix2_transform (data, 1, length);
 
 	return 0;
 }
 
-int ifft(double *data, int length, double *ifft_data){
+int ifft(double *data, int length, double *ifft_data)
+{
 
 
 	gsl_fft_halfcomplex_radix2_inverse (data, 1, length);
@@ -111,7 +114,8 @@ int ifft(double *data, int length, double *ifft_data){
 	return 0;
 }
 
-int dct1d(double *data, int length, double *dct_data){
+int dct1d(double *data, int length, double *dct_data)
+{
 /*	% computes the discrete cosine transform of the column vector data
 	[nrows,ncols]= size(data);
 	% Compute weights to multiply DFT coefficients
@@ -141,7 +145,8 @@ int dct1d(double *data, int length, double *dct_data){
 	return 0;
 }
 
-int idct1d(double *data, int length, double *dct_data){
+int idct1d(double *data, int length, double *dct_data)
+{
 /*	% computes the inverse discrete cosine transform
 	[nrows,ncols]=size(data);
 	% Compute weights
@@ -183,7 +188,8 @@ int idct1d(double *data, int length, double *dct_data){
 	return 0;
 }
 
-int fixed_point(double t, int N, double *It, double *a2){
+int fixed_point(double t, int N, double *It, double *a2)
+{
 /*	function  out=fixed_point(t,N,I,a2)
 	% this implements the function t-zeta*gamma^[l](t)
 	l=7;
@@ -243,7 +249,7 @@ void kde(double *data, int length, int n ,double dataMIN, double dataMAX)
 		initial_data[i]=initial_data[i]/sum_initial_data;
 
 	double a[n];
-	dct1d(initial_data,n,a); // discrete cosine transform of initial data
+	kde_dct_fftw(initial_data,n,a); // discrete cosine transform of initial data
 	
 	/*now compute the optimal bandwidth^2 using the referenced method*/
 	double It[n-1];
@@ -252,16 +258,20 @@ void kde(double *data, int length, int n ,double dataMIN, double dataMAX)
 	double a2[n-1];
 	for(int i=0;i<n-1;i++)
 		a2[i] = pow(a[i+1]/2,2);
-	
+
+double t_star=.28*pow(N,-2.0/5.0);
 	/*use  fzero to solve the equation t=zeta*gamma^[5](t)*/
 /*	try
 		t_star=fzero(@(t)fixed_point(t,N,I,a2),[0,.1])
 	catch
 		t_star=.28*N^(-2/5);
 	end
-*/	
+*/
+  
 	/*smooth the discrete cosine transform of initial data using t_star*/
-//	a_t=a.*exp(-[0:n-1]'.^2*pi^2*t_star/2);
+	double a_t[n];
+	for(int i=0;i<n;i++)
+		a_t[i]=a[i]*exp(-i^2*M_PI^2*t_star/2);
 	
 	
 	
@@ -278,28 +288,28 @@ void kde(double *data, int length, int n ,double dataMIN, double dataMAX)
 
 int main( int argc, char** argv )
 {
-XML_IN;
+	XML_IN;
 	int length=0;
 	double *data=NULL;
 	const char * full_fname = "../../../matlab/data.txt";
-	
+
 	file_read_into_array_doubles(full_fname, &data, &length);
-	
+
 	if  (verbose==1 || verbose==-1)
 	{
-	print_vec(data,"data",0,length);
+		print_vec(data,"data",0,length);
 	}
-	
+
 	double maximum, minimum;
 	find_max_min_array_doubles(data,length,&maximum,&minimum);
 	//kde(data,length,pow(2,14),minimum-5,maximum+5);
 	kde(data,length,128,minimum-5,maximum+5);
-	
+
 	if (verbose==1 || verbose==-1)
 	{
 		//printf("---DATA---\n"); for (int i=0; i<300; i++) printf("%f\n",data[i]);
 	}
 	free(data);
-XML_OUT;
+	XML_OUT;
 	return 0;
 }

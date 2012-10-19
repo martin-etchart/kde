@@ -18,5 +18,6 @@
 
 int print_vec(double *v, char* title, int start, int end);
 int file_read_into_array_doubles(const char *filename , double **out_data, int *length);
+void kde_dct_fftw(double *in, int n, double* out);
 
 #endif //_KDE_UTIL
