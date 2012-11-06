@@ -188,12 +188,20 @@ int idct1d(double *data, int length, double *dct_data)
 	return 0;
 }
 
-int fixed_point(double t, int N, double *It, double *a2)
+double fixed_point(double t, int N, double *It, double *a2, int n)
 {
 /*	function  out=fixed_point(t,N,I,a2)
 	% this implements the function t-zeta*gamma^[l](t)
-	l=7;
-	f=2*pi^(2*l)*sum(I.^l.*a2.*exp(-I*pi^2*t));
+	*/
+	//l=7;
+	int l=7;
+double sum_f=0;
+for(int i=0;i<n;i++)
+	sum_f+=pow(It[i],l)*a2[i]*exp(-It[i]*pow(MATH_PI,2.0)*t);
+double f=2*pow(MATH_PI,2.0*l)*sum_f;
+
+/*
+f=2*pi^(2*l)*sum(I.^l.*a2.*exp(-I*pi^2*t));
 	for s=l-1:-1:2
 		K0=prod([1:2:2*s-1])/sqrt(2*pi);  const=(1+(1/2)^(s+1/2))/3;
 		time=(2*const*K0/N/f)^(2/(3+2*s));
