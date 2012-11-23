@@ -59,7 +59,7 @@ I=[1:n-1]'.^2; a2=(a(2:end)/2).^2;
 
 % use  fzero to solve the equation t=zeta*gamma^[5](t)
 try
-    t_star=fzero(@(t)fixed_point(t,N,I,a2),[0,.1]);
+    t_star=fzero(@(t)kde_fixed_point(t,N,I,a2),[0,.1]);
 catch
     t_star=.28*N^(-2/5);
 end

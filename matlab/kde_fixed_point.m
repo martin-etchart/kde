@@ -1,5 +1,5 @@
 %################################################################
-function  out=fixed_point(t,N,I,a2)
+function  out=kde_fixed_point(t,N,I,a2)
 % this implements the function t-zeta*gamma^[l](t)
 l=7;
 f=2*pi^(2*l)*sum(I.^l.*a2.*exp(-I*pi^2*t));
