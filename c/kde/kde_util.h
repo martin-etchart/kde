@@ -19,5 +19,7 @@
 int print_vec(double *v, char* title, int start, int end);
 int file_read_into_array_doubles(const char *filename , double **out_data, int *length);
 void kde_dct_fftw(double *in, int n, double* out);
+void kde_idct_fftw(double *in, int n, double* out);
+double fixed_point(double t, int N, double *It, double *a2, int n);
 
 #endif //_KDE_UTIL

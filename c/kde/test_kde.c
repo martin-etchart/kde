@@ -7,6 +7,7 @@
 #include <gsl/gsl_fft_real.h>
 #include <gsl/gsl_fft_halfcomplex.h>
 #include "kde_util.h"
+#include "roots.h"
 
 int verbose = -1;
 
@@ -188,31 +189,6 @@ int idct1d(double *data, int length, double *dct_data)
 	return 0;
 }
 
-double fixed_point(double t, int N, double *It, double *a2, int n)
-{
-/*	function  out=fixed_point(t,N,I,a2)
-	% this implements the function t-zeta*gamma^[l](t)
-	*/
-	//l=7;
-	int l=7;
-double sum_f=0;
-for(int i=0;i<n;i++)
-	sum_f+=pow(It[i],l)*a2[i]*exp(-It[i]*pow(MATH_PI,2.0)*t);
-double f=2*pow(MATH_PI,2.0*l)*sum_f;
-
-/*
-f=2*pi^(2*l)*sum(I.^l.*a2.*exp(-I*pi^2*t));
-	for s=l-1:-1:2
-		K0=prod([1:2:2*s-1])/sqrt(2*pi);  const=(1+(1/2)^(s+1/2))/3;
-		time=(2*const*K0/N/f)^(2/(3+2*s));
-		f=2*pi^(2*s)*sum(I.^s.*a2.*exp(-I*pi^2*time));
-	end
-	out=t-(2*N*sqrt(pi)*f)^(-2/5);
-	end
-*/
-
-	return 0;
-}
 
 
 
@@ -267,27 +243,47 @@ void kde(double *data, int length, int n ,double dataMIN, double dataMAX)
 	for(int i=0;i<n-1;i++)
 		a2[i] = pow(a[i+1]/2,2);
 
-double t_star=.28*pow(N,-2.0/5.0);
+	double t_star=.28*pow(N,-2.0/5.0);
 	/*use  fzero to solve the equation t=zeta*gamma^[5](t)*/
-/*	try
+	/*	try
 		t_star=fzero(@(t)fixed_point(t,N,I,a2),[0,.1])
-	catch
+		catch
 		t_star=.28*N^(-2/5);
-	end
-*/
-  
+		end
+		*/
+
+	//test fixed point values
+	double t=0.05;
+	double tt=fixed_point(t,N,It,a2,n);
+	printf("tt: %g\n",tt);
+
+
+	int status=fzero(&t_star,N,It,a2,n);
+	printf("t_star: %g\n",t_star);
+
 	/*smooth the discrete cosine transform of initial data using t_star*/
 	double a_t[n];
 	for(int i=0;i<n;i++)
-		a_t[i]=a[i]*exp(-i^2*M_PI^2*t_star/2);
+		a_t[i]=a[i]*exp(-pow(i*M_PI,2)*t_star/2);
 	
+	double density[n];
+	kde_idct_fftw(a_t,n,density); 
 	
-	
+	for(int i=0;i<n;i++)
+		density[i]/=R;
+
+	double bandwidth=sqrt(t_star)*R;
+
+	printf("bandwidth: %g\n",bandwidth);
+
 	if  (verbose==3 || verbose==-1)
 	{
+      int range[2]={0,128};
 		print_vec(xmesh,"xmesh",0,128);
 		print_vec(initial_data,"initial_data",0,128);
 		print_vec(a,"a",0,128);
+		print_vec(a_t,"a_t",0,128);
+		print_vec(density,"density",0,128);
 	}
 
 	
@@ -299,7 +295,7 @@ int main( int argc, char** argv )
 	XML_IN;
 	int length=0;
 	double *data=NULL;
-	const char * full_fname = "../../../matlab/data.txt";
+	const char * full_fname = "../../../matlab/test_data.txt";
 
 	file_read_into_array_doubles(full_fname, &data, &length);
 
