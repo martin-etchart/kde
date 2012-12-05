@@ -27,12 +27,17 @@ int main( int argc, char** argv )
 
 
 	double *out=malloc(length*sizeof(*out));
-	kde_dct_fftw(data, length, out);
+	//kde_dct_fftw(data, length, out);
+	dct_fftw(data, length, out);
+
+	double *data_rec=malloc(length*sizeof(*data_rec));
+	idct_fftw(data, length, out);
 
 	if  (verbose==1 || verbose==-1)
 	{
 		print_vec(data,"data",0,length);
 		print_vec(out,"out",0,length);
+		print_vec(data,"data_rec",0,length);
 	}
 
 	free(out);

@@ -1,6 +1,6 @@
 N=length(initial_data);
 
-%%use kde_dct to reproduce matlab
+%% use kde_dct to reproduce matlab
 in_data_n=initial_data;
 in_data_n=in_data_n/sqrt(2*N);
 y1=dct(initial_data);

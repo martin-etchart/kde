@@ -23,6 +23,30 @@ out_matlab=dct(in)
 
 
 %% test
-%in=[0.0545    0.2442    0.4026    0.2442    0.0545];
-in=[1.86181 1.1547 0.447594];
+in=[0.0545    0.2442    0.4026    0.2442    0.0545];
 out_kde_dct=kde_dct1d(in)
+
+%% test dct fftw using matlab
+in=[0.0545    0.2442    0.4026    0.2442    0.0545];
+out_kde_dct=kde_dct1d(in)
+
+%% full test dct reproduced in matlab
+in = fspecial('gaussian',[128 1],5);
+
+out_fftw_matlab=fftw_dct_with_matlab(in);
+norm(out_fftw_matlab-out_fftw')
+figure(4)
+plot(out_fftw_matlab,'-r')
+hold on
+plot(out_fftw,'-b')
+hold off
+
+%% full test idct reproduced in matlab
+
+in_rec_fftw_matlab=fftw_idct_with_matlab(out_fftw);
+norm(in_rec_fftw_matlab-in_rec_fftw)
+figure(4)
+plot(in_rec_fftw_matlab,'-r')
+hold on
+plot(in_rec_fftw,'-b')
+hold off

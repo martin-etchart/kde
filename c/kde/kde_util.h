@@ -21,4 +21,7 @@ void kde_dct_fftw(double *in, int n, double* out);
 void kde_idct_fftw(double *in, int n, double* out);
 double fixed_point(double t, int N, double *It, double *a2, int n);
 
+void dct_fftw(double *in, int n, double* out);
+void idct_fftw(double *in, int n, double* out);
+
 #endif //_KDE_UTIL

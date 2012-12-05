@@ -1,6 +1,11 @@
 #include "kde_util.h"
 #include <stdio.h>
 #include <fftw3.h>
+#include <math.h>
+
+#ifndef M_PI
+#    define M_PI 3.14159265358979323846
+#endif
 
 int print_vec(double *v, char* title, int start, int end)
 {
@@ -55,6 +60,28 @@ void kde_dct_fftw(double *in, int n, double* out)
 	free(in_n);
 }
 
+void dct_fftw(double *in, int n, double* out)
+{
+
+	fftw_plan dct =	fftw_plan_r2r_1d(n, in, out, FFTW_REDFT10, FFTW_MEASURE);
+
+	fftw_execute(dct);
+
+	fftw_destroy_plan(dct);
+
+}
+
+
+void idct_fftw(double *in, int n, double* out)
+{
+
+	fftw_plan idct =	fftw_plan_r2r_1d(n, in, out, FFTW_REDFT01, FFTW_MEASURE);
+
+	fftw_execute(idct);
+
+	fftw_destroy_plan(idct);
+
+}
 
 void kde_idct_fftw(double *in, int n, double* out)
 {
