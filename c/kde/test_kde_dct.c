@@ -11,7 +11,6 @@
 #include <gsl/gsl_fft_real.h>
 #include <gsl/gsl_fft_halfcomplex.h>
 #include "kde_util.h"
-#include <fftw3.h>
 
 int verbose = -1;
 
@@ -19,24 +18,25 @@ int verbose = -1;
 
 int main( int argc, char** argv )
 {
-XML_IN;
+	XML_IN;
 	int length=0;
 	double *data=NULL;
-	const char * full_fname = "../../../matlab/data.txt";
-	
+	const char * full_fname = "../../../matlab/test_data.txt";
+
 	file_read_into_array_doubles(full_fname, &data, &length);
-	
+
+
+	double *out=malloc(length*sizeof(*out));
+	kde_dct_fftw(data, length, out);
+
 	if  (verbose==1 || verbose==-1)
 	{
-	print_vec(data,"data",0,length);
+		print_vec(data,"data",0,length);
+		print_vec(out,"out",0,length);
 	}
-	
-	
-	if (verbose==1 || verbose==-1)
-	{
-		//printf("---DATA---\n"); for (int i=0; i<300; i++) printf("%f\n",data[i]);
-	}
+
+	free(out);
 	free(data);
-XML_OUT;
+	XML_OUT;
 	return 0;
 }

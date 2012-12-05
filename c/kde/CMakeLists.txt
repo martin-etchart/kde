@@ -21,7 +21,8 @@ test_kde test_kde_dct
 
 
 SET( OBJ_LIST_TMP
-kde_util 
+kde_util
+roots
  )
  
 SET(OBJ_LIST )

@@ -13,18 +13,14 @@ dct_matlab=dct(idct_matlab)
 
 %% fftw dct
 %normalized input
-y = x;
-y(1) = x(1) / sqrt(2);
-idct_fftw= idct(y) *sqrt(2*n)
+idct_fftw=fftw_idct_with_matlab(x)
 
-xt=idct_fftw/sqrt(2*n)
-dct_fftw=dct(xt);
-dct_fftw(1)=dct_fftw(1)*sqrt(2);
-dct_fftw
+dct_fftw=fftw_dct_with_matlab(idct_fftw)
 
 %% test direct DCT
 in=[1.8618    1.1547    0.4476]
 out_matlab=dct(in)
+
 
 %% test
 %in=[0.0545    0.2442    0.4026    0.2442    0.0545];
