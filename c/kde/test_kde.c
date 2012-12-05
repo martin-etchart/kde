@@ -1,7 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#ifdef __APPLE__
 #include <malloc/malloc.h>
+#else
+#include <malloc.h>
+#endif
 #include <complex.h>
 #include <gsl/gsl_histogram.h>
 #include <gsl/gsl_fft_real.h>
@@ -287,7 +291,7 @@ XML_IN;
 	
 	if  (verbose==1 || verbose==-1)
 	{
-	print_vec(data,"data",0,length);
+		print_vec(data,"data",0,length);
 	}
 	
 	double maximum, minimum;
