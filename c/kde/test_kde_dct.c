@@ -12,8 +12,20 @@
 #include <gsl/gsl_fft_halfcomplex.h>
 #include "kde_util.h"
 
+#include <fftw3.h>
+
 int verbose = -1;
 
+void print_v(double* v, int n, char* title)
+{
+	printf("%s:", title);
+
+	for(int i = 0; i < n; i++)
+	{
+		printf(" %g", v[i]);
+	}
+	printf("\n");
+}
 
 
 int main( int argc, char** argv )
@@ -27,11 +39,12 @@ int main( int argc, char** argv )
 
 
 	double *out=malloc(length*sizeof(*out));
-	//kde_dct_fftw(data, length, out);
+	kde_dct_fftw(data, length, out);
 	dct_fftw(data, length, out);
 
 	double *data_rec=malloc(length*sizeof(*data_rec));
-	idct_fftw(data, length, out);
+	kde_idct_fftw(data, length, data_rec);
+	idct_fftw(data, length, data_rec);
 
 	if  (verbose==1 || verbose==-1)
 	{
@@ -42,6 +55,7 @@ int main( int argc, char** argv )
 
 	free(out);
 	free(data);
+	free(data_rec);
 	XML_OUT;
 	return 0;
 }

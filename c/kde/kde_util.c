@@ -38,26 +38,39 @@ int file_read_into_array_doubles(const char *filename , double **out_data, int *
             fscanf(in_file, "%lg", data+j);
         }
         fclose(in_file);
-		  *out_data=data;
+        *out_data=data;
     }
     return 0;
 }
 
-void kde_dct_fftw(double *in, int n, double* out)
+void kde_idct_fftw(double *in, int n, double* out)
 {
-
-	double* in_n=malloc(n*sizeof(*in_n));
-	fftw_plan dct =	fftw_plan_r2r_1d(n, in_n, out, FFTW_REDFT10, FFTW_MEASURE);
+	double *in_n=malloc(n*sizeof(*in_n));
+	fftw_plan idct =	fftw_plan_r2r_1d(n, in_n, out, FFTW_REDFT01, FFTW_MEASURE);
 
 	for(int i = 0; i < n; i++)
-		in_n[i]=in[i]*2*n;
+		in_n[i]=in[i];
+
+	in_n[0]*=2;
+
+	fftw_execute(idct);
+
+	for(int i = 0; i < n; i++)
+		out[i]*=n;
+
+	fftw_destroy_plan(idct);
+	free(in_n);
+}
+
+void kde_dct_fftw(double *in, int n, double* out)
+{
+	fftw_plan dct =	fftw_plan_r2r_1d(n, in, out, FFTW_REDFT10, FFTW_MEASURE);
 
 	fftw_execute(dct);
 
 	out[0]/=2.0;
 
 	fftw_destroy_plan(dct);
-	free(in_n);
 }
 
 void dct_fftw(double *in, int n, double* out)
@@ -74,40 +87,21 @@ void dct_fftw(double *in, int n, double* out)
 
 void idct_fftw(double *in, int n, double* out)
 {
-
 	fftw_plan idct =	fftw_plan_r2r_1d(n, in, out, FFTW_REDFT01, FFTW_MEASURE);
 
 	fftw_execute(idct);
 
 	fftw_destroy_plan(idct);
-
 }
 
-void kde_idct_fftw(double *in, int n, double* out)
-{
 
-	double* in_n=malloc(n*sizeof(*in_n));
-	fftw_plan idct =	fftw_plan_r2r_1d(3, in_n, out, FFTW_REDFT01, FFTW_MEASURE);
-	
-
-	for(int i = 0; i < n; i++)
-		in_n[i]=in[i];
-
-		in_n[0]*=2;
-
-	fftw_execute(idct);
-	
-	for(int i = 0; i < n; i++)
-		out[i]/=2.0;
-
-	fftw_destroy_plan(idct);
-	free(in_n);
-}
 
 
 
 double fixed_point(double t, int N, double *It, double *a2, int n)
 {
+	int verbose=0;
+	if(verbose) XML_IN;
 	/*	function  out=fixed_point(t,N,I,a2)
 		% this implements the function t-zeta*gamma^[l](t)
 		*/
@@ -115,9 +109,12 @@ double fixed_point(double t, int N, double *It, double *a2, int n)
 	int l=7;
 	double sum_f=0;
 	double f=0;
-	for(int i=0;i<n;i++)
+	for(int i=0;i<n-1;i++)
 		sum_f+=pow(It[i],l)*a2[i]*exp(-It[i]*pow(M_PI,2.0)*t);
 	f=2*pow(M_PI,2.0*l)*sum_f;
+
+	if(verbose) printf("f: %g\n",f);
+	if(verbose) printf("sum_f: %g\n",sum_f);
 
 	/*
 		f=2*pi^(2*l)*sum(I.^l.*a2.*exp(-I*pi^2*t));
@@ -129,22 +126,24 @@ double fixed_point(double t, int N, double *It, double *a2, int n)
 		out=t-(2*N*sqrt(pi)*f)^(-2/5);
 		end
 		*/
-	for(int s=l-1;l>=2;l--)
+	for(int s=l-1;s>=2;s--)
 	{
-		double c=(1+pow(0.5,(s+1)/2.0))/3;
+		double c=(1+pow(0.5,s+0.5))/3;
 		double k0=1;
 
-		for(int i=1;i<s;i+=2)
-			k0*=i/sqrt(2*M_PI);
+		for(int i=1;i<2*s;i+=2)
+			k0*=i;
+		k0/=sqrt(2*M_PI);
 		double tim=pow(2*c*k0/N/f,2.0/(3+2*s));
-		
-		for(int i=0;i<n;i++)
+		sum_f=0;
+		for(int i=0;i<n-1;i++)
 			sum_f+=pow(It[i],s)*a2[i]*exp(-It[i]*pow(M_PI,2.0)*tim);
 		f=2*pow(M_PI,2.0*s)*sum_f;
-
-	
+		if(verbose) printf("s: %d c: %g k0: %g tim: %g f: %g \n",s,c,k0,tim,f);
+		if(verbose) printf("sum_f: %g\n",sum_f);
 	}
 	double out=t-pow(2*N*sqrt(M_PI)*f,-2/5.0);
+	if(verbose) XML_OUT;
 	return out;
 }
 

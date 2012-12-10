@@ -239,15 +239,17 @@ void kde(double *data, int length, int n ,double dataMIN, double dataMAX)
 	double a[n];
 	kde_dct_fftw(initial_data,n,a); // discrete cosine transform of initial data
 	
+
 	/*now compute the optimal bandwidth^2 using the referenced method*/
 	double It[n-1];
 	for (int i=0;i<n-1;i++)
-		It[i]=pow(i+1,2);
+		It[i]=pow(i+1,2.0);
+
 	double a2[n-1];
 	for(int i=0;i<n-1;i++)
-		a2[i] = pow(a[i+1]/2,2);
+		a2[i] = pow(a[i+1]/2.0,2.0);
 
-	double t_star=.28*pow(N,-2.0/5.0);
+	double t_star=0;
 	/*use  fzero to solve the equation t=zeta*gamma^[5](t)*/
 	/*	try
 		t_star=fzero(@(t)fixed_point(t,N,I,a2),[0,.1])
@@ -257,37 +259,47 @@ void kde(double *data, int length, int n ,double dataMIN, double dataMAX)
 		*/
 
 	//test fixed point values
-	double t=0.05;
-	double tt=fixed_point(t,N,It,a2,n);
+	double t=0.01;
+	double tt;
+	tt=fixed_point(t,N,It,a2,n);
 	printf("tt: %g\n",tt);
-
+	tt=fixed_point(0,N,It,a2,n);
+	printf("tt: %g\n",tt);
+	tt=fixed_point(0.1,N,It,a2,n);
+	printf("tt: %g\n",tt);
 
 	int status=fzero(&t_star,N,It,a2,n);
 	printf("t_star: %g\n",t_star);
+	//t_star=.28*pow(N,-2.0/5.0);
+	//printf("t_star: %g\n",t_star);
 
 	/*smooth the discrete cosine transform of initial data using t_star*/
 	double a_t[n];
 	for(int i=0;i<n;i++)
-		a_t[i]=a[i]*exp(-pow(i*M_PI,2)*t_star/2);
-	
+		a_t[i]=a[i]*exp(-pow(i*M_PI,2.0)*t_star/2.0);
+
+
 	double density[n];
 	kde_idct_fftw(a_t,n,density); 
-	
+
 	for(int i=0;i<n;i++)
-		density[i]/=R;
+		density[i]/=R*n*2;
 
 	double bandwidth=sqrt(t_star)*R;
 
 	printf("bandwidth: %g\n",bandwidth);
 
+
 	if  (verbose==3 || verbose==-1)
 	{
       int range[2]={0,128};
-		print_vec(xmesh,"xmesh",0,128);
-		print_vec(initial_data,"initial_data",0,128);
-		print_vec(a,"a",0,128);
-		print_vec(a_t,"a_t",0,128);
-		print_vec(density,"density",0,128);
+		print_vec(xmesh,"xmesh",0,n);
+		print_vec(data,"data",0,300);
+		print_vec(initial_data,"initial_data",0,n);
+		print_vec(a,"a",0,n);
+		print_vec(a_t,"a_t",0,n);
+		print_vec(a2,"a_2",0,n-1);
+		print_vec(density,"density",0,n);
 	}
 
 	
@@ -299,7 +311,7 @@ int main( int argc, char** argv )
 	XML_IN;
 	int length=0;
 	double *data=NULL;
-	const char * full_fname = "../../../matlab/test_data.txt";
+	const char * full_fname = "../../../matlab/data.txt";
 
 	file_read_into_array_doubles(full_fname, &data, &length);
 
@@ -313,10 +325,6 @@ int main( int argc, char** argv )
 	//kde(data,length,pow(2,14),minimum-5,maximum+5);
 	kde(data,length,128,minimum-5,maximum+5);
 
-	if (verbose==1 || verbose==-1)
-	{
-		//printf("---DATA---\n"); for (int i=0; i<300; i++) printf("%f\n",data[i]);
-	}
 	free(data);
 	XML_OUT;
 	return 0;
