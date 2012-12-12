@@ -147,3 +147,56 @@ double fixed_point(double t, int N, double *It, double *a2, int n)
 	return out;
 }
 
+void peakdet( int n, double *x, double *v, double delta)
+{
+	XML_IN;
+
+	double* maxtab=malloc(n*sizeof(*maxtab));
+	double* mintab=malloc(n*sizeof(*mintab));
+
+	int idx_min=0,idx_max=0;
+
+	double mn=999,mx=-999;
+	double mnpos=-1,mxpos=-1;
+
+	int lookformax=1;
+
+	for(int i=0;i<n;i++)
+	{
+		double this=v[i];
+		if(this>mx)
+		{
+			mx=this; mxpos=x[i];
+		}
+
+		if(this<mn)
+		{
+			mn=this; mnpos=x[i];
+		}
+
+		if(lookformax)
+		{
+			if(this<mx-delta)
+			{
+				maxtab[idx_max]=mxpos;
+				mn=this; mnpos=x[i];
+				idx_max++;
+				lookformax=0;
+			}
+		}else
+		{
+			if(this>mn+delta)
+			{
+				mintab[idx_min]=mnpos;
+				mx=this; mxpos=x[i];
+				idx_min++;
+				lookformax=1;
+			}
+		}
+	}
+
+	print_vec(mintab,"mintab",0,idx_min);
+	print_vec(maxtab,"maxtab",0,idx_max);
+
+	XML_OUT;
+}

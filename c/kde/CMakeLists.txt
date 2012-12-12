@@ -16,7 +16,7 @@ set(LIBS ${FFTW3_LIBRARIES})
 ENDIF(FFTW3_FOUND)
 
 SET( EXAMPLE_LIST
-test_kde test_kde_dct 
+test_kde test_kde_dct test_extrema
  )
 
 

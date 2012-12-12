@@ -306,6 +306,7 @@ void kde(double *data, int length, int n ,double dataMIN, double dataMAX)
 }
 
 
+
 int main( int argc, char** argv )
 {
 	XML_IN;
@@ -324,6 +325,8 @@ int main( int argc, char** argv )
 	find_max_min_array_doubles(data,length,&maximum,&minimum);
 	//kde(data,length,pow(2,14),minimum-5,maximum+5);
 	kde(data,length,128,minimum-5,maximum+5);
+
+
 
 	free(data);
 	XML_OUT;
