@@ -22,6 +22,7 @@ test_kde test_kde_dct test_extrema
 
 SET( OBJ_LIST_TMP
 kde_util
+kde
 roots
  )
  
