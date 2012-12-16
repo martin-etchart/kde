@@ -13,8 +13,8 @@
 #include "kde_util.h"
 #include "roots.h"
 
-int verbose = -1;
 
+int verbose = -1;
 
 int file_read_into_array_doubles_l(const char *filename , double *data, int *length)
 {

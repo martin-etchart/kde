@@ -11,10 +11,9 @@
 #include <gsl/gsl_fft_real.h>
 #include <gsl/gsl_fft_halfcomplex.h>
 #include "kde_util.h"
+#include "kde.h"
 
 #include <fftw3.h>
-
-int verbose = -1;
 
 
 int main( int argc, char** argv )

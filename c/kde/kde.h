@@ -1,3 +1,10 @@
+#ifndef KDE_H_
+#define KDE_H_
+
+#include <complex.h>
+
+extern int verbose;
+
 int file_read_into_array_doubles_l(const char *filename , double *data, int *length);
 
 int find_max_min_array_doubles(double *a, int length, double *max, double *min);
@@ -18,3 +25,5 @@ int idct1d(double *data, int length, double *dct_data);
 
 
 void kde(double *data, int length, int n ,double dataMIN, double dataMAX);
+
+#endif //KDE_H_

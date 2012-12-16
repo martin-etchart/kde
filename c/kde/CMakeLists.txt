@@ -15,6 +15,9 @@ include_directories(${FFTW3_INCLUDE_DIRS})
 set(LIBS ${FFTW3_LIBRARIES})
 ENDIF(FFTW3_FOUND)
 
+include_directories("/usr/local/include")
+link_directories("/usr/local/lib")
+
 SET( EXAMPLE_LIST
 test_kde test_kde_dct test_extrema
  )
