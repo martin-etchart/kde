@@ -32,12 +32,17 @@ int main( int argc, char** argv )
 
 	double delta=1e-3;
 
-	peakdet( length, x, data, delta);
+	int l_min,l_max;
+	double* min_x;
+	double* max_x;
+	peakdet( length, x, data, delta,&l_min,&min_x,&l_max,&max_x);
 
 	if  (verbose==1 || verbose==-1)
 	{
 		print_vec(x,"x",0,length);
 		print_vec(data,"data",0,length);
+		print_vec(min_x,"min_x",0,l_min);
+		print_vec(max_x,"max_x",0,l_max);
 	}
 
 	free(data);

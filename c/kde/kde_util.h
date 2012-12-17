@@ -24,6 +24,6 @@ double fixed_point(double t, int N, double *It, double *a2, int n);
 void dct_fftw(double *in, int n, double* out);
 void idct_fftw(double *in, int n, double* out);
 
-void peakdet( int n, double *x, double *v, double delta);
+void peakdet( int n, double *x, double *v, double delta, int* l_min, double** min_x, int* l_max, double** max_x);
 
 #endif //_KDE_UTIL
