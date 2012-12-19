@@ -84,7 +84,7 @@ int histc(double *data, double *xmesh, int n , double *bins)
 
 	printf("1\n");
 
-	for (int i=0; i<300; i++)
+	for (int i=0; i<n; i++)
 		gsl_histogram_increment (h, data[i]);
 
 	printf("2\n");

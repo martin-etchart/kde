@@ -4,6 +4,7 @@
 #include  "gsl/gsl_roots.h"
 #include "kde_util.h"
 
+
 typedef struct {
   int N;
   double *It;
@@ -15,7 +16,7 @@ double my_f(double x, void *params)
 {
     my_f_params *p=(my_f_params *)params;
     return fixed_point(x,p->N,p->It,p->a2,p->n);
-  }
+}
 
 
 int fzero(double *x_star, double N, double* It, double* a2, int n)

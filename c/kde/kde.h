@@ -1,6 +1,11 @@
 #ifndef KDE_H_
 #define KDE_H_
 
+#if defined(__cplusplus) && !defined(WIN32)
+extern "C" {
+#endif
+
+
 #include <complex.h>
 
 extern int verbose;
@@ -23,7 +28,10 @@ int dct1d(double *data, int length, double *dct_data);
 
 int idct1d(double *data, int length, double *dct_data);
 
-
 void kde(double *data, int length, int n ,double dataMIN, double dataMAX);
+
+#if defined(__cplusplus) && !defined(WIN32)
+}
+#endif
 
 #endif //KDE_H_
