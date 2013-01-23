@@ -114,7 +114,7 @@ void idct_fftw(double *in, int n, double* out)
 
 double fixed_point(double t, int N, double *It, double *a2, int n)
 {
-	int verbose=1;
+	int verbose=0;
 	if(verbose) XML_IN;
 	/*	function  out=fixed_point(t,N,I,a2)
 		% this implements the function t-zeta*gamma^[l](t)
@@ -154,7 +154,7 @@ double fixed_point(double t, int N, double *It, double *a2, int n)
 		double c=(1.0+pow(0.5,s+0.5))/3.0;
 		double tim=pow(2.0*c*k0/N/f,2.0/(3.0+2.0*s));
 		double tim2=2.0*c*k0/N/f;
-		 printf("N: %d tim2: %g\n",N,tim2);
+		if(verbose)  printf("N: %d tim2: %g\n",N,tim2);
 		sum_f=0;
 		for(int i=0;i<n-1;i++)
 			sum_f+=pow(It[i],s)*a2[i]*exp(-It[i]*pow(M_PI,2.0)*tim);
@@ -240,3 +240,5 @@ void peakdet( int n, double *x, double *v, double delta, int* l_min, double** mi
 
 	XML_OUT;
 }
+
+

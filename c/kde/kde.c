@@ -11,10 +11,11 @@
 #include <gsl/gsl_fft_real.h>
 #include <gsl/gsl_fft_halfcomplex.h>
 #include "kde_util.h"
+#include "kde.h"
 #include "roots.h"
 
 
-int verbose = -1;
+int verbose = 3;
 
 int file_read_into_array_doubles_l(const char *filename , double *data, int *length)
 {
@@ -217,12 +218,12 @@ void kde(double *data, int length, int n ,double dataMIN, double dataMAX, double
 	if ( (fabs(dataMIN+1)<tol) && (fabs(dataMAX+1)<tol) )
 	{
 		printf("using automatic extrema determination\n");
-	//define the default  interval [MIN,MAX]
-	double maximum,minimum;
-	find_max_min_array_doubles(data,length,&maximum,&minimum);
-	double Range=maximum-minimum;
-    dataMIN=minimum-Range/10.0; dataMAX=maximum+Range/10.0;
-    printf("min: %g max: %g\n",dataMIN,dataMAX);
+		//define the default  interval [MIN,MAX]
+		double maximum,minimum;
+		find_max_min_array_doubles(data,length,&maximum,&minimum);
+		double Range=maximum-minimum;
+		dataMIN=minimum-Range/10.0; dataMAX=maximum+Range/10.0;
+		printf("min: %g max: %g\n",dataMIN,dataMAX);
 	}
 
     /*set up the grid over which the density estimate is computed;*/
@@ -232,7 +233,7 @@ void kde(double *data, int length, int n ,double dataMIN, double dataMAX, double
 	for (int i=0; i<n; i++ ) xmesh[i] = dataMIN+i*dx;
 
 	double N = length; //double N=length(unique(data)); //qsort(data, length, sizeof(double), compare_doubles);
-	N=128;	//FIXME: we have emulate the unique matlab function.
+	N=256;	//FIXME: we have emulate the unique matlab function.
 	/*bin the data uniformly using the grid defined above;*/
 	double initial_data[n];
 	histc(data, length, xmesh, n , initial_data);
@@ -298,7 +299,7 @@ void kde(double *data, int length, int n ,double dataMIN, double dataMAX, double
 	printf("bandwidth: %g\n",bandwidth);
 
 
-	if  (verbose>=3 || verbose==-1)
+	if  (verbose>=2 || verbose<=3)
 	{
       int range[2]={0,128};
 		print_vec(xmesh,"xmesh",0,n);
@@ -310,11 +311,15 @@ void kde(double *data, int length, int n ,double dataMIN, double dataMAX, double
 		print_vec(density,"density",0,n);
 	}
 
-	array_write_ascii(initial_data, n, "initial_data.txt");
-	array_write_ascii(data, length, "data.txt");
-	array_write_ascii(density, n, "density.txt");
-	array_write_ascii(a_t, n, "a_t.txt");
-	array_write_ascii(a2, n-1, "a_2.txt");
+	if  (verbose>=3)
+	{
+		array_write_ascii(xmesh,n,"xmesh.txt");
+		array_write_ascii(initial_data, n, "initial_data.txt");
+		array_write_ascii(data, length, "data.txt");
+		array_write_ascii(density, n, "density.txt");
+		array_write_ascii(a_t, n, "a_t.txt");
+		array_write_ascii(a2, n-1, "a_2.txt");
+	}
 
 	//prepare output
 	*bw=bandwidth;
@@ -326,6 +331,38 @@ void kde(double *data, int length, int n ,double dataMIN, double dataMAX, double
 	XML_OUT;
 }
 
+void bones_get_threshold(double* data, int length)
+{
+	XML_IN;
+	int verbose=1;
+
+	double maximum, minimum;
+	double bw=-1;
+	double *density=NULL;
+	double *x=NULL;
+	int n=128;
+	kde(data,length,n,-1,-1, &density, &x, &bw);
+
+	//compute maxima
+	double delta=1e-3;
+	int l_min,l_max;
+	double* min_x;
+	double* max_x;
+	peakdet( n, x, density, delta, &l_min,&min_x,&l_max,&max_x);
+
+	if  (verbose==1 || verbose==-1)
+	{
+		print_vec(x,"x",0,n);
+		print_vec(density,"density",0,n);
+		print_vec(data,"data",0,length);
+		print_vec(min_x,"min_x",0,l_min);
+		print_vec(max_x,"max_x",0,l_max);
+	}
+
+	if(!density)
+		free(density);
+	XML_OUT;
+}
 
 
 

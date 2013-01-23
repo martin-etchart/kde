@@ -62,7 +62,7 @@ if opt.show_plots
     hold on
     if(exist('data_fftw'))
     plot(data_fftw,'-r')
-    norm(data-data_fftw')
+    norm(data-data_fftw)
     end
     hold off
 end
@@ -84,7 +84,7 @@ if opt.show_plots
     hold on
     if(exist('initial_data_fftw'))
     plot(initial_data_fftw,'-r')
-    norm(initial_data-initial_data_fftw')
+    norm(initial_data-initial_data_fftw)
     end
     hold off
 end
@@ -107,7 +107,7 @@ tt=kde_fixed_point(0.01,N,I,a2)
 tt=kde_fixed_point(0.0,N,I,a2)
 tt=kde_fixed_point(0.1,N,I,a2)
 
-keyboard
+
 
 %plot fixed point
 tin=[-0.1:1e-5:0.1];
@@ -188,11 +188,11 @@ end
 
 if opt.show_plots
    figure(22)
-    plot(density,'-b')
+    plot(xmesh,density,'-b')
     hold on
     if(exist('density_fftw'))
-    plot(density_fftw,'-r')
-    norm(density-density_fftw')
+    plot(xmesh,density_fftw,'-r')
+    norm(density-density_fftw)
     end
     hold off
 end
