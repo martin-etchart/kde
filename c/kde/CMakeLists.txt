@@ -18,17 +18,19 @@ ENDIF(FFTW3_FOUND)
 include_directories("/usr/local/include")
 link_directories("/usr/local/lib")
 
-SET( EXAMPLE_LIST test_kde test_kde_dct test_extrema )
+SET( EXAMPLE_LIST test_kde test_kde_dct test_extrema test_get_threshold)
 
 SET( OBJ_LIST_TMP roots kde kde_util   )
  
 SET(OBJ_LIST )
+set(KDE_SOURCES "" PARENT_SCOPE)
+set(KDE_HEADERS )
 
 MESSAGE( STATUS "OBJ LIST")
 foreach (var ${OBJ_LIST_TMP})
 	MESSAGE( STATUS "o: " ${var})
-	set(KDE_HEADERS	${KDE_HEADERS} ${CMAKE_CURRENT_SOURCE_DIR}/${var}.h PARENT_SCOPE)
-	set(KDE_SOURCES	${KDE_SOURCES} ${CMAKE_CURRENT_SOURCE_DIR}/${var}.c PARENT_SCOPE)
+	set(KDE_HEADERS	${KDE_HEADERS} ${CMAKE_CURRENT_SOURCE_DIR}/${var}.h)
+	set(KDE_SOURCES	${KDE_SOURCES} ${CMAKE_CURRENT_SOURCE_DIR}/${var}.c)
 
 	SET(OBJ_LIST ${OBJ_LIST} ${var}.c )
 	if(WIN32)
@@ -37,7 +39,8 @@ foreach (var ${OBJ_LIST_TMP})
 endforeach()
 
 MESSAGE( STATUS "obj_list: " ${OBJ_LIST})
-
+set(KDE_SOURCES	"${KDE_SOURCES}" PARENT_SCOPE)	#this is lame but works
+MESSAGE( STATUS "KDE_SOURCES: " ${KDE_SOURCES})
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC -std=c99")
 

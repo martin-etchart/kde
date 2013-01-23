@@ -28,11 +28,28 @@ int main( int argc, char** argv )
 
 	double maximum, minimum;
 	double bw=-1;
-	double* density=NULL;
-	double* x=NULL;
+	double *density=NULL;
+	double *x=NULL;
 	find_max_min_array_doubles(data,length,&maximum,&minimum);
-	//kde(data,length,pow(2,14),minimum-5,maximum+5);
-	kde(data,length,128,minimum-5,maximum+5, &density, &x, &bw);
+	int n=128;
+	kde(data,length,n,minimum-5,maximum+5, &density, &x, &bw);
+
+	//compute maxima
+	double delta=1e-3;
+	int l_min,l_max;
+	double* min_x;
+	double* max_x;
+	peakdet( n, x, density, delta, &l_min,&min_x,&l_max,&max_x);
+
+	if  (verbose==1 || verbose==-1)
+	{
+		print_vec(x,"x",0,n);
+		print_vec(density,"density",0,n);
+		print_vec(data,"data",0,length);
+		print_vec(min_x,"min_x",0,l_min);
+		print_vec(max_x,"max_x",0,l_max);
+	}
+
 
 
 	if(!density)

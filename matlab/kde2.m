@@ -68,6 +68,17 @@ if opt.show_plots
 end
 
 if opt.show_plots
+    figure(13)
+    plot(xmesh,'-b')
+    hold on
+    if(exist('xmesh_fftw'))
+    plot(xmesh_fftw,'-r')
+    norm(xmesh-xmesh_fftw)
+    end
+    hold off
+end
+
+if opt.show_plots
     figure(11)
     plot(initial_data,'-b')
     hold on
@@ -96,15 +107,37 @@ tt=kde_fixed_point(0.01,N,I,a2)
 tt=kde_fixed_point(0.0,N,I,a2)
 tt=kde_fixed_point(0.1,N,I,a2)
 
+keyboard
+
+%plot fixed point
+tin=[-0.1:1e-5:0.1];
+lt=length(tin);
+tout=zeros(1,lt);
+figure(15)
+for i=1:lt
+    ti=tin(i);
+    tout(i)=kde_fixed_point(ti,N,I,a2);
+end
+plot(tin,tin, '-b')
+hold on
+plot(tin,tout, '-r')
+hold off
+figure(16)
+plot(tin,tout-tin)
+
 
 
 % use  fzero to solve the equation t=zeta*gamma^[5](t)
 try
-    t_star=fzero(@(t)kde_fixed_point(t,N,I,a2),[0,.1]);
+    options=optimset('fzero');
+    t_star=fzero(@(t)kde_fixed_point(t,N,I,a2),[0,.1],options);
 catch
     t_star=.28*N^(-2/5);
 end
+%just for debug with fixed values
 %t_star=.28*N^(-2/5);
+%t_star=1.04904e-06;
+
 
 % smooth the discrete cosine transform of initial data using t_star
 a_t=a.*exp(-[0:n-1]'.^2*pi^2*t_star/2);
@@ -116,7 +149,7 @@ if opt.show_plots
     hold on
     if(exist('a2_fftw'))
     plot(a2_fftw,'-r')
-    norm(a2-a2_fftw')
+    norm(a2-a2_fftw)
     end
     hold off
 end
@@ -127,7 +160,7 @@ if opt.show_plots
     hold on
     if(exist('a_t_fftw'))
     plot(a_t_fftw,'-r')
-    norm(a_t-a_t_fftw')
+    norm(a_t-a_t_fftw)
     end
     hold off
 end
@@ -157,7 +190,7 @@ if opt.show_plots
    figure(22)
     plot(density,'-b')
     hold on
-    if(exist('a_t_fftw'))
+    if(exist('density_fftw'))
     plot(density_fftw,'-r')
     norm(density-density_fftw')
     end

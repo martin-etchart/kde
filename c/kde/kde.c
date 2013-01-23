@@ -38,7 +38,7 @@ int file_read_into_array_doubles_l(const char *filename , double *data, int *len
 
 int find_max_min_array_doubles(double *a, int length, double *max, double *min)
 {
-	// Find maximum and minimum element in an arary.
+	// Find maximum and minimum element in an array.
 	*max = a[0];
 	*min = a[0];
 
@@ -68,8 +68,9 @@ int compare_doubles (const void *a, const void *b)
 
 double log2(double x) {	return (log(x) / log(2.0)); }
 
-int histc(double *data, double *xmesh, int n , double *bins)
+int histc(double *data, int length, double *xmesh, int n , double *bins)
 {
+	XML_IN;
 
 	printf("-1\n");
 
@@ -82,9 +83,9 @@ int histc(double *data, double *xmesh, int n , double *bins)
 	double h_max = gsl_histogram_max(h);
 	double h_min = gsl_histogram_min(h);
 
-	printf("1\n");
+	printf("h_min: %g h_max: %g\n",h_min,h_max);
 
-	for (int i=0; i<n; i++)
+	for (int i=0; i<length; i++)
 		gsl_histogram_increment (h, data[i]);
 
 	printf("2\n");
@@ -99,6 +100,7 @@ int histc(double *data, double *xmesh, int n , double *bins)
 
 	gsl_histogram_free(h);
 
+	XML_OUT;
 	return 0;
 }
 
@@ -196,8 +198,9 @@ int idct1d(double *data, int length, double *dct_data)
 
 
 
-void kde(double *data, int length, int n ,double dataMIN, double dataMAX)
+void kde(double *data, int length, int n ,double dataMIN, double dataMAX, double **out_density, double **out_x, double *bw)
 {
+	XML_IN;
 /*
  * function [bandwidth,density,xmesh,cdf]=kde(data,n,dataMIN,dataMAX)
  *  Reference: 
@@ -210,24 +213,29 @@ void kde(double *data, int length, int n ,double dataMIN, double dataMAX)
 	n = pow( 2 , 14 ); 
 	*/
 	n = pow( 2 , ceil(log2(n)) ); // round up n to the next power of 2;
-	/*define the default  interval [MIN,MAX]
+	double tol=1e-6;
+	if ( (fabs(dataMIN+1)<tol) && (fabs(dataMAX+1)<tol) )
+	{
+		printf("using automatic extrema determination\n");
+	//define the default  interval [MIN,MAX]
 	double maximum,minimum;
 	find_max_min_array_doubles(data,length,&maximum,&minimum);
 	double Range=maximum-minimum;
-    dataMIN=minimum-Range/10; dataMAX=maximum+Range/10;
-    */
-    
+    dataMIN=minimum-Range/10.0; dataMAX=maximum+Range/10.0;
+    printf("min: %g max: %g\n",dataMIN,dataMAX);
+	}
+
     /*set up the grid over which the density estimate is computed;*/
 	double R=dataMAX-dataMIN; 
 	double dx=R/(n-1);
-	double xmesh[n];
+	double* xmesh=(double*)malloc(n*sizeof(*xmesh));
 	for (int i=0; i<n; i++ ) xmesh[i] = dataMIN+i*dx;
 
 	double N = length; //double N=length(unique(data)); //qsort(data, length, sizeof(double), compare_doubles);
-	
+	N=128;	//FIXME: we have emulate the unique matlab function.
 	/*bin the data uniformly using the grid defined above;*/
 	double initial_data[n];
-	histc(data, xmesh, n , initial_data);
+	histc(data, length, xmesh, n , initial_data);
 	double sum_initial_data = 0;
 	for(int i=0;i<n;i++){
 		initial_data[i]=initial_data[i]/N;
@@ -259,11 +267,11 @@ void kde(double *data, int length, int n ,double dataMIN, double dataMAX)
 		*/
 
 	//test fixed point values
-	double t=0.01;
+	double t=0;
 	double tt;
-	tt=fixed_point(t,N,It,a2,n);
+	tt=fixed_point(0.01,N,It,a2,n);
 	printf("tt: %g\n",tt);
-	tt=fixed_point(0,N,It,a2,n);
+	tt=fixed_point(0.0,N,It,a2,n);
 	printf("tt: %g\n",tt);
 	tt=fixed_point(0.1,N,It,a2,n);
 	printf("tt: %g\n",tt);
@@ -279,7 +287,7 @@ void kde(double *data, int length, int n ,double dataMIN, double dataMAX)
 		a_t[i]=a[i]*exp(-pow(i*M_PI,2.0)*t_star/2.0);
 
 
-	double density[n];
+	double *density=(double* )malloc(n*sizeof(*density));
 	kde_idct_fftw(a_t,n,density); 
 
 	for(int i=0;i<n;i++)
@@ -290,11 +298,11 @@ void kde(double *data, int length, int n ,double dataMIN, double dataMAX)
 	printf("bandwidth: %g\n",bandwidth);
 
 
-	if  (verbose==3 || verbose==-1)
+	if  (verbose>=3 || verbose==-1)
 	{
       int range[2]={0,128};
 		print_vec(xmesh,"xmesh",0,n);
-		print_vec(data,"data",0,300);
+		print_vec(data,"data",0,length);
 		print_vec(initial_data,"initial_data",0,n);
 		print_vec(a,"a",0,n);
 		print_vec(a_t,"a_t",0,n);
@@ -302,7 +310,20 @@ void kde(double *data, int length, int n ,double dataMIN, double dataMAX)
 		print_vec(density,"density",0,n);
 	}
 
-	
+	array_write_ascii(initial_data, n, "initial_data.txt");
+	array_write_ascii(data, length, "data.txt");
+	array_write_ascii(density, n, "density.txt");
+	array_write_ascii(a_t, n, "a_t.txt");
+	array_write_ascii(a2, n-1, "a_2.txt");
+
+	//prepare output
+	*bw=bandwidth;
+	if(!(*out_density))
+		*out_density=density;
+	if(!(*out_x))
+			*out_x=xmesh;
+
+	XML_OUT;
 }
 
 

@@ -18,7 +18,7 @@ int compare_doubles (const void *a, const void *b);
 
 double log2(double x);
 
-int histc(double *data, double *xmesh, int n , double *bins);
+int histc(double *data, int length, double *xmesh, int n_bins, double *bins);
 
 int fft(double *data, int length, double complex *fft_data);
 
@@ -28,7 +28,7 @@ int dct1d(double *data, int length, double *dct_data);
 
 int idct1d(double *data, int length, double *dct_data);
 
-void kde(double *data, int length, int n ,double dataMIN, double dataMAX);
+void kde(double *data, int length, int n ,double dataMIN, double dataMAX, double **out_density, double **out_x, double *bw);
 
 #if defined(__cplusplus) && !defined(WIN32)
 }

@@ -17,6 +17,20 @@ int print_vec(double *v, char* title, int start, int end)
 	XML_OUT;
 }
 
+void array_write_ascii(double *v, int n, const char* filename)
+{
+	FILE *fid = fopen(filename, "w");
+
+	fprintf(fid, "%d\n", n);
+
+	for (int i = 0; i < n; i++) {
+		fprintf(fid, "%18.12f\n", v[i]);
+	}
+
+	fclose(fid);
+}
+
+
 int file_read_into_array_doubles(const char *filename , double **out_data, int *length)
 {
     FILE *in_file;
@@ -100,7 +114,7 @@ void idct_fftw(double *in, int n, double* out)
 
 double fixed_point(double t, int N, double *It, double *a2, int n)
 {
-	int verbose=0;
+	int verbose=1;
 	if(verbose) XML_IN;
 	/*	function  out=fixed_point(t,N,I,a2)
 		% this implements the function t-zeta*gamma^[l](t)
@@ -108,13 +122,17 @@ double fixed_point(double t, int N, double *It, double *a2, int n)
 	//l=7;
 	int l=7;
 	double sum_f=0;
+	double sum_f_2=0;
 	double f=0;
 	for(int i=0;i<n-1;i++)
 		sum_f+=pow(It[i],l)*a2[i]*exp(-It[i]*pow(M_PI,2.0)*t);
 	f=2*pow(M_PI,2.0*l)*sum_f;
 
-	if(verbose) printf("f: %g\n",f);
-	if(verbose) printf("sum_f: %g\n",sum_f);
+	for(int i=0;i<n-1;i++)
+			sum_f_2+=pow(It[i],l)*exp(-It[i]*pow(M_PI,2.0)*t);
+
+	if(verbose) printf("t: %g\n",t);
+	if(verbose) printf("sum_f_2: %g sum_f: %g f: %g\n",sum_f_2,sum_f,f);
 
 	/*
 		f=2*pi^(2*l)*sum(I.^l.*a2.*exp(-I*pi^2*t));
@@ -128,13 +146,15 @@ double fixed_point(double t, int N, double *It, double *a2, int n)
 		*/
 	for(int s=l-1;s>=2;s--)
 	{
-		double c=(1+pow(0.5,s+0.5))/3;
 		double k0=1;
-
 		for(int i=1;i<2*s;i+=2)
 			k0*=i;
 		k0/=sqrt(2*M_PI);
-		double tim=pow(2*c*k0/N/f,2.0/(3+2*s));
+
+		double c=(1.0+pow(0.5,s+0.5))/3.0;
+		double tim=pow(2.0*c*k0/N/f,2.0/(3.0+2.0*s));
+		double tim2=2.0*c*k0/N/f;
+		 printf("N: %d tim2: %g\n",N,tim2);
 		sum_f=0;
 		for(int i=0;i<n-1;i++)
 			sum_f+=pow(It[i],s)*a2[i]*exp(-It[i]*pow(M_PI,2.0)*tim);
@@ -142,7 +162,7 @@ double fixed_point(double t, int N, double *It, double *a2, int n)
 		if(verbose) printf("s: %d c: %g k0: %g tim: %g f: %g \n",s,c,k0,tim,f);
 		if(verbose) printf("sum_f: %g\n",sum_f);
 	}
-	double out=t-pow(2*N*sqrt(M_PI)*f,-2/5.0);
+	double out=t-pow(2*N*sqrt(M_PI)*f,-2.0/5.0);
 	if(verbose) XML_OUT;
 	return out;
 }
