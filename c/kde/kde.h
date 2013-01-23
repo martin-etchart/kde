@@ -29,7 +29,8 @@ int dct1d(double *data, int length, double *dct_data);
 int idct1d(double *data, int length, double *dct_data);
 
 void kde(double *data, int length, int n ,double dataMIN, double dataMAX, double **out_density, double **out_x, double *bw);
-void bones_get_threshold(double* data, int length);
+
+void bones_get_threshold(double* data, int length, double* ths);
 
 #if defined(__cplusplus) && !defined(WIN32)
 }

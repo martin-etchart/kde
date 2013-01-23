@@ -331,7 +331,7 @@ void kde(double *data, int length, int n ,double dataMIN, double dataMAX, double
 	XML_OUT;
 }
 
-void bones_get_threshold(double* data, int length)
+void bones_get_threshold(double* data, int length, double* ths)
 {
 	XML_IN;
 	int verbose=1;
@@ -359,8 +359,15 @@ void bones_get_threshold(double* data, int length)
 		print_vec(max_x,"max_x",0,l_max);
 	}
 
+
+	ths[0]=0;
+	ths[1]=min_x[1];
+	printf("lo: %g hi: %g\n",ths[0],ths[1]);
+
 	if(!density)
 		free(density);
+	if(!x)
+		free(x);
 	XML_OUT;
 }
 

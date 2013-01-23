@@ -22,7 +22,8 @@ int main( int argc, char** argv )
 
 	file_read_into_array_doubles(full_fname, &data, &length);
 
-	bones_get_threshold(data,length);
+	double ths[2];
+	bones_get_threshold(data,length,ths);
 
 
 	free(data);
