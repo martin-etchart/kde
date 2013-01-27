@@ -30,6 +30,7 @@ void dct_fftw(double *in, int n, double* out);
 void idct_fftw(double *in, int n, double* out);
 
 void peakdet( int n, double *x, double *v, double delta, int* l_min, double** min_x, int* l_max, double** max_x);
+void quick(int array[], int start, int end);
 
 #if defined(__cplusplus) && !defined(WIN32)
 }
