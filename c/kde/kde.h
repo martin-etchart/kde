@@ -20,13 +20,6 @@ double log2(double x);
 
 int histc(double *data, int length, double *xmesh, int n_bins, double *bins);
 
-int fft(double *data, int length, double complex *fft_data);
-
-int ifft(double *data, int length, double *ifft_data);
-
-int dct1d(double *data, int length, double *dct_data);
-
-int idct1d(double *data, int length, double *dct_data);
 
 void kde(double *data, int length, int n ,double dataMIN, double dataMAX, double **out_density, double **out_x, double *bw);
 
