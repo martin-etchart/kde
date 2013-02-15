@@ -63,7 +63,7 @@ double* unique(int l, double* v, int* l_out) {
     
     long unsigned int len = vec.size();
     *l_out=(int)len;
-    double v_out[len];
+    double v_out[*l_out];
     
     std::cout << "Salida del Unique: [ ";
     int i=0;
@@ -75,7 +75,7 @@ double* unique(int l, double* v, int* l_out) {
     std::cout << *(vec.end()-1) << ']' << std::endl;
     v_out[i]=*(vec.end()-1);
     
-    return 0;
+    return v_out;
 }
 
 int histogram(int* counts, int len, double* data, double* bins) {

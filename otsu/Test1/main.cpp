@@ -42,8 +42,12 @@ int main(int argc, char** argv) {
     int size_out;
     double* vector_prueba_out = unique(sizeof(vector_prueba)/sizeof(vector_prueba[0]),vector_prueba, &size_out);
 
-    std::cout<<"ASDF"<<size_out;
-    //double_vector_print(size_out,vector_prueba_out);
+    std::cout<<"ASDF: "<<size_out<<std::endl;
+    std::cout<<"ASDF: "<<vector_prueba_out<<std::endl;
+    std::cout<<"ASDF: "<<vector_prueba_out[1]<<std::endl;
+    
+    double_vector_print(size_out,vector_prueba_out);
 
+    
     return 0;
 }
