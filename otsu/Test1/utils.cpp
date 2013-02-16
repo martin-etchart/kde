@@ -47,13 +47,13 @@ int int_vector_print(int l, int* v) {
     std::cout << v[l - 1] << " ]" << std::endl;
 }
 
-double* unique(int l, double* v, int* l_out) {
-    std::cout << "Al principio: ";
-    double_vector_print(l, v);
+int unique(int l, double* v, int* l_out, double** v_out) {
+//    std::cout << "Al principio: ";
+//    double_vector_print(l, v);
 
     std::sort(v, v + l); // Sort
-    std::cout << "Despues del sort: ";
-    double_vector_print(l, v);
+//    std::cout << "Despues del sort: ";
+//    double_vector_print(l, v);
 
     std::vector<double> vec; // (vector_prueba, vector_prueba+(sizeof(vector_prueba)/sizeof(vector_prueba[0])));
     for (int j = 0; j < l - 1; j++)
@@ -63,19 +63,23 @@ double* unique(int l, double* v, int* l_out) {
     
     long unsigned int len = vec.size();
     *l_out=(int)len;
-    double v_out[*l_out];
     
-    std::cout << "Salida del Unique: [ ";
+    double *v_aux = NULL;
+    v_aux = (double*) malloc(*l_out * sizeof (*v_aux));
+    
+//    std::cout << "Salida del Unique: [ ";
     int i=0;
     for (std::vector<double>::iterator it = vec.begin(); it != (vec.end()-1); ++it) {
-        std::cout << *it << ", ";
-        v_out[i]=*it;
+//        std::cout << *it << ", ";
+        v_aux[i]=*it;
         i++;
     }
-    std::cout << *(vec.end()-1) << ']' << std::endl;
-    v_out[i]=*(vec.end()-1);
+//    std::cout << *(vec.end()-1) << ']' << std::endl;
+    v_aux[i]=*(vec.end()-1);
     
-    return v_out;
+    *v_out=v_aux;
+    
+    return 0;
 }
 
 int histogram(int* counts, int len, double* data, double* bins) {
