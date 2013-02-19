@@ -2,8 +2,8 @@ close all
 clear all
 clc
 
-% filename = 'trimodal2gaussian.png';
-filename = 'peppers.png';
+filename = 'trimodal2gaussian.png';
+% filename = 'peppers.png';
 
 I=im2double(rgb2gray(imread(filename)));
 
@@ -24,5 +24,6 @@ figure; stem(cBins,cHist); title('Histograma en C')
 % disp([cHist' matlabHist])
 
 [Iseg3,sep3] = otsu(I,3);
-[Iseg2,sep2] = otsu(I,2);
-figure; imshow([I Iseg3;Iseg2 zeros(size(I))]); 
+% [Iseg2,sep2] = otsu(I,2);
+% figure; imshow([I Iseg3;Iseg2 zeros(size(I))]);
+figure; imshow([I Iseg3]); 

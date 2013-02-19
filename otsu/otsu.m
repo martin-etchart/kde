@@ -72,13 +72,12 @@ elseif nbins<n
     return
 elseif nbins<256
     [histo,pixval] = hist(I(:),unI);
-    keyboard
 else
     [histo,pixval] = hist(I(:),256);
 end
+figure; stem(pixval,histo); title('Histograma en MATLAB')
 P = histo/sum(histo);
 clear unI
-
 %% Zeroth- and first-order cumulative moments
 w = cumsum(P);
 mu = cumsum((1:nbins).*P);
