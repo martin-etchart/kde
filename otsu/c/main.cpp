@@ -26,8 +26,8 @@ int main(int argc, char** argv)
     int xsize;
     int ysize;
     double *data = NULL;
-    const char * full_fname = "../../trimodal2gaussian.txt";
-    //const char * full_fname = "../peppers.txt";
+    const char * full_fname = "../../pics/trimodal2gaussian.txt";
+    //const char * full_fname = "../../pics/peppers.txt";
     file_read_into_array_doubles_mat(full_fname, &data, &xsize, &ysize);
 
     // Unique
@@ -67,6 +67,8 @@ int main(int argc, char** argv)
 	    bins[i] = bins[i - 1] + step;
     }
 
+    // free aca ya puedo liberar la memoria de unI
+
     histogram(counts, xsize*ysize, nbins, data, bins);
 
     //  Display vector for matlab comparison
@@ -81,18 +83,34 @@ int main(int argc, char** argv)
     for (int i = 0; i < nbins; i++)
 	P[i] = (double) counts[i] / (xsize * ysize);
 
-    double w[nbins], mu[nbins];
-    w[0] = P[0];
-    mu[0] = P[0];
+    // cumsum
+    double w[nbins], mu[nbins], Pi[nbins];
+    Pi[0] = P[0];
     for (int i = 1; i < nbins; i++)
-    {
-	w[i] = w[i - 1] + P[i];
-	mu[i] = mu[i - 1]+(i + 1) * P[i];
-    }
+	Pi[i] = (i + 1) * P[i];
+
+    cumsum(w, P, nbins);
+    cumsum(mu, Pi, nbins);
 
     double_vector_save_to_file("P.txt", nbins, P);
     double_vector_save_to_file("w.txt", nbins, w);
     double_vector_save_to_file("mu.txt", nbins, mu);
+
+    double w_aux[nbins - 2], mu_aux[nbins - 2], aux1[nbins - 2], aux2[nbins - 2], sigma2B[nbins - 2];
+    for (int i = 0; i < nbins - 2; i++)
+    {
+	w_aux[i] = w[i + 1];
+	mu_aux[i] = mu[i + 1];
+	aux1[i] = mu[nbins-1]*w_aux[i] - mu_aux[i];
+    }
+    
+    vector_pow(aux2, aux1, 2, nbins - 2);    
+    divide_vectors(aux1, aux2, w_aux, nbins - 2);
+    for (int i = 0; i < nbins - 2; i++)
+	aux2[i] = 1 - w_aux[i];
+    divide_vectors(sigma2B, aux1, aux2, nbins - 2);
+
+    double_vector_save_to_file("sigma2B.txt", nbins - 2, sigma2B);
 
     return 0;
 }
