@@ -155,6 +155,13 @@ int divide_vectors(double* c, double* a, double* b, int N)
 	c[i] = a[i] / b[i];
 }
 
+int multiplicate_vectors(double* c, double* a, double* b, int N)
+{
+    /* c = a.*b */
+    for (int i = 0; i < N; i++)
+	c[i] = a[i] * b[i];
+}
+
 int vector_max(double* m, int* index, double* v, int N)
 {
     *m = v[0];
@@ -165,4 +172,16 @@ int vector_max(double* m, int* index, double* v, int N)
 	    *m = v[i];
 	    *index = i;
 	}
+}
+
+int vector_flip(double* b, double* a, int N)
+{
+    /* 
+     * b = flipud(a) 
+     * b = fliplr(a)       
+     */
+
+    for (int i = 0; i < N; i++)
+	b[i] = a[N - 1 - i];
+
 }

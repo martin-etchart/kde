@@ -22,12 +22,14 @@ int LEVELS = 256;
 int main(int argc, char** argv)
 {
 
+    int N = 3;
+
     // Read image from text file
     int xsize;
     int ysize;
     double *data = NULL;
     const char * full_fname = "../../pics/trimodal2gaussian.txt";
-    //const char * full_fname = "../../pics/peppers.txt";
+//    const char * full_fname = "../../pics/peppers.txt";
     file_read_into_array_doubles_mat(full_fname, &data, &xsize, &ysize);
     // Unique
     int unI_size;
@@ -95,33 +97,150 @@ int main(int argc, char** argv)
     double_vector_save_to_file("w.txt", nbins, w);
     double_vector_save_to_file("mu.txt", nbins, mu);
 
-    double w_aux[nbins - 2], mu_aux[nbins - 2], aux1[nbins - 2], aux2[nbins - 2], sigma2B[nbins - 2];
-    for (int i = 0; i < nbins - 2; i++)
-    {
-	w_aux[i] = w[i + 1];
-	mu_aux[i] = mu[i + 1];
-	aux1[i] = mu[nbins - 1] * w_aux[i] - mu_aux[i];
-    }
-
-    vector_pow(aux2, aux1, 2, nbins - 2);
-    divide_vectors(aux1, aux2, w_aux, nbins - 2);
-    for (int i = 0; i < nbins - 2; i++)
-	aux2[i] = 1 - w_aux[i];
-    divide_vectors(sigma2B, aux1, aux2, nbins - 2);
-
-    double_vector_save_to_file("sigma2B.txt", nbins - 2, sigma2B);
+    double* w_aux;
+    double* mu_aux;
+    double* aux1;
+    double* aux2;
+    double* sigma2B;
+    double data_out[xsize * ysize];
 
     double sigma2Bmax;
     int ind_sigma2Bmax;
-    vector_max(&sigma2Bmax, &ind_sigma2Bmax, sigma2B, nbins - 2);
-    std::cout << "Maximo: " << sigma2Bmax << std::endl << "Posicion del maximo: " << ind_sigma2Bmax << std::endl;
-    std::cout << "pixval: " << bins[ind_sigma2Bmax + 1] << std::endl;
-    double data_out[xsize * ysize];
-    for (int i = 0; i < xsize * ysize; i++)
-	if (data[i] <= bins[ind_sigma2Bmax + 1])
-	    data_out[i] = 0;
-	else
-	    data_out[i] = 1;
+
+    if (N == 2)
+    {
+	w_aux = new double[nbins - 2];
+	mu_aux = new double[nbins - 2];
+	aux1 = new double[nbins - 2];
+	aux2 = new double[nbins - 2];
+	sigma2B = new double[nbins - 2];
+
+	for (int i = 0; i < nbins - 2; i++)
+	{
+	    w_aux[i] = w[i + 1];
+	    mu_aux[i] = mu[i + 1];
+	    aux1[i] = mu[nbins - 1] * w_aux[i] - mu_aux[i];
+	}
+
+	vector_pow(aux2, aux1, 2, nbins - 2);
+	divide_vectors(aux1, aux2, w_aux, nbins - 2);
+	for (int i = 0; i < nbins - 2; i++)
+	    aux2[i] = 1 - w_aux[i];
+	divide_vectors(sigma2B, aux1, aux2, nbins - 2);
+
+	double_vector_save_to_file("sigma2B.txt", nbins - 2, sigma2B);
+
+	vector_max(&sigma2Bmax, &ind_sigma2Bmax, sigma2B, nbins - 2);
+	std::cout << "Maximo: " << sigma2Bmax << std::endl << "Posicion del maximo: " << ind_sigma2Bmax << std::endl;
+	std::cout << "pixval: " << bins[ind_sigma2Bmax + 1] << std::endl;
+
+	for (int i = 0; i < xsize * ysize; i++)
+	    if (data[i] <= bins[ind_sigma2Bmax + 1])
+		data_out[i] = 0;
+	    else
+		data_out[i] = 1;
+
+
+    } else if (N == 3)
+    {
+	//		w_aux = new double[nbins ];
+	//		mu_aux = new double[nbins ];
+	aux1 = new double[nbins];
+	aux2 = new double[nbins];
+	sigma2B = new double[nbins * nbins];
+
+	double w0[nbins * nbins], w1[nbins * nbins], w2[nbins * nbins], mu0_aux[nbins], mu2_aux[nbins], mu0[nbins * nbins], mu2[nbins * nbins];
+
+	vector_flip(aux1, P, nbins);
+	cumsum(aux2, aux1, nbins);
+	vector_flip(aux1, aux2, nbins);
+
+	for (int i = 0; i < nbins; i++)
+	    for (int j = 0; j < nbins; j++)
+	    {
+		w0[i * nbins + j] = w[i];
+		w2[i * nbins + j] = aux1[j];
+	    }
+
+	double_vector_save_to_file("w0.txt", nbins*nbins, w0);
+	double_vector_save_to_file("w2.txt", nbins*nbins, w2);
+
+	divide_vectors(mu0_aux, mu, w, nbins);
+	vector_flip(aux1, Pi, nbins);
+	cumsum(aux2, aux1, nbins);
+
+	double aux3[nbins];
+	vector_flip(aux3, P, nbins);
+	cumsum(aux1, aux3, nbins);
+
+	divide_vectors(aux3, aux2, aux1, nbins);
+	vector_flip(mu2_aux, aux3, nbins);
+
+	for (int i = 0; i < nbins; i++)
+	    for (int j = 0; j < nbins; j++)
+	    {
+		mu0[i * nbins + j] = mu0_aux[i];
+		mu2[i * nbins + j] = mu2_aux[j];
+	    }
+
+	double_vector_save_to_file("mu0.txt", nbins*nbins, mu0);
+	double_vector_save_to_file("mu2.txt", nbins*nbins, mu2);
+
+	for (int i = 1; i < nbins * nbins; i++)
+	{
+	    w1[i] = 1 - w0[i] - w2[i];
+	    //	    if (w1[i] <= 0)
+	    //		w1[i] = NAN;
+	}
+
+	double aux4[nbins * nbins], aux5[nbins * nbins], t1[nbins * nbins], t2[nbins * nbins], t3[nbins * nbins], t4[nbins * nbins], t34[nbins * nbins], t34_aux[nbins * nbins];
+
+	for (int i = 0; i < nbins * nbins; i++)
+	    aux4[i] = mu0[i] - mu[nbins - 1];
+	vector_pow(aux5, aux4, 2, nbins * nbins);
+	multiplicate_vectors(t1, w0, aux5, nbins * nbins);
+	multiplicate_vectors(t3, w0, aux4, nbins * nbins);
+
+	for (int i = 0; i < nbins * nbins; i++)
+	    aux4[i] = mu2[i] - mu[nbins - 1];
+	vector_pow(aux5, aux4, 2, nbins * nbins);
+	multiplicate_vectors(t2, w2, aux5, nbins * nbins);
+	multiplicate_vectors(t4, w2, aux4, nbins * nbins);
+	for (int i = 0; i < nbins * nbins; i++)
+	    t34[i] = t3[i] + t4[i];
+	vector_pow(t34_aux, t34, 2, nbins * nbins);
+	divide_vectors(t34, t34_aux, w1, nbins * nbins);
+
+	for (int i = 0; i < nbins * nbins; i++)
+	{
+	    sigma2B[i] = t1[i] + t2[i] + t34[i];
+	    if (w1[i] <= 0)
+		sigma2B[i] = 0;
+	    //	    if (isnan(sigma2B[i]))
+	    //		sigma2B[i] = 0;
+	}
+
+	double_vector_save_to_file("sigma2B.txt", nbins*nbins, sigma2B);
+
+	vector_max(&sigma2Bmax, &ind_sigma2Bmax, sigma2B, nbins * nbins);
+	std::cout << "Maximo: " << sigma2Bmax << std::endl << "Posicion del maximo: " << ind_sigma2Bmax << std::endl;
+
+	int k1, k2;
+
+	k1 = (int) ind_sigma2Bmax / nbins;
+	k2 = ind_sigma2Bmax % nbins;
+
+	std::cout << "k1 = " << k1 << ", k2 = " << k2 << std::endl;
+
+	for (int i = 0; i < xsize * ysize; i++)
+	    if (data[i] <= bins[k1])
+		data_out[i] = 0;
+	    else if (data[i] > bins[k1] & data[i] <= bins[k2])
+		data_out[i] = 0.5;
+	    else
+		data_out[i] = 1;
+
+    }
 
     double_vector_save_to_file("data_out.txt", xsize*ysize, data_out);
 
