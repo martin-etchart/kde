@@ -29,7 +29,6 @@ int main(int argc, char** argv)
     const char * full_fname = "../../pics/trimodal2gaussian.txt";
     //const char * full_fname = "../../pics/peppers.txt";
     file_read_into_array_doubles_mat(full_fname, &data, &xsize, &ysize);
-
     // Unique
     int unI_size;
     double* unI;
@@ -101,16 +100,30 @@ int main(int argc, char** argv)
     {
 	w_aux[i] = w[i + 1];
 	mu_aux[i] = mu[i + 1];
-	aux1[i] = mu[nbins-1]*w_aux[i] - mu_aux[i];
+	aux1[i] = mu[nbins - 1] * w_aux[i] - mu_aux[i];
     }
-    
-    vector_pow(aux2, aux1, 2, nbins - 2);    
+
+    vector_pow(aux2, aux1, 2, nbins - 2);
     divide_vectors(aux1, aux2, w_aux, nbins - 2);
     for (int i = 0; i < nbins - 2; i++)
 	aux2[i] = 1 - w_aux[i];
     divide_vectors(sigma2B, aux1, aux2, nbins - 2);
 
     double_vector_save_to_file("sigma2B.txt", nbins - 2, sigma2B);
+
+    double sigma2Bmax;
+    int ind_sigma2Bmax;
+    vector_max(&sigma2Bmax, &ind_sigma2Bmax, sigma2B, nbins - 2);
+    std::cout << "Maximo: " << sigma2Bmax << std::endl << "Posicion del maximo: " << ind_sigma2Bmax << std::endl;
+    std::cout << "pixval: " << bins[ind_sigma2Bmax + 1] << std::endl;
+    double data_out[xsize * ysize];
+    for (int i = 0; i < xsize * ysize; i++)
+	if (data[i] <= bins[ind_sigma2Bmax + 1])
+	    data_out[i] = 0;
+	else
+	    data_out[i] = 1;
+
+    double_vector_save_to_file("data_out.txt", xsize*ysize, data_out);
 
     return 0;
 }

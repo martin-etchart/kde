@@ -73,11 +73,13 @@ int int_vector_save_to_file(char* filename, int l, int* v)
     fclose(file);
 }
 
-int unique(int l, double* v, int* l_out, double** v_out)
+int unique(int l, double* v_in, int* l_out, double** v_out)
 {
     //    std::cout << "Al principio: ";
     //    double_vector_print(l, v);
-
+    double v[l];
+    for (int i = 0; i < l; i++)
+	v[i] = v_in[i];
     std::sort(v, v + l); // Sort
     //    std::cout << "Despues del sort: ";
     //    double_vector_print(l, v);
@@ -151,4 +153,16 @@ int divide_vectors(double* c, double* a, double* b, int N)
     /* c = a./b */
     for (int i = 0; i < N; i++)
 	c[i] = a[i] / b[i];
+}
+
+int vector_max(double* m, int* index, double* v, int N)
+{
+    *m = v[0];
+    *index = 0;
+    for (int i = 1; i < N; i++)
+	if (v[i] >= *m)
+	{
+	    *m = v[i];
+	    *index = i;
+	}
 }

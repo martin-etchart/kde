@@ -86,7 +86,7 @@ mu = cumsum((1:nbins).*P);
 if n==2
     sigma2B =...
         (mu(end)*w(2:end-1)-mu(2:end-1)).^2./w(2:end-1)./(1-w(2:end-1));
-    keyboard
+%     keyboard
     [maxsig,k] = max(sigma2B);
         
     % segmented image
@@ -95,7 +95,7 @@ if n==2
     
     % separability criterion
     sep = maxsig/sum(((1:nbins)-mu(end)).^2.*P);
-    
+%     keyboard
 elseif n==3
     w0 = w;
     w2 = fliplr(cumsum(fliplr(P)));

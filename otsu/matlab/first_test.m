@@ -30,7 +30,14 @@ figure;plot(wC);title('Funcion de probabilidad')
 sigma2BC=load('../c/@build/sigma2B.txt');
 figure;plot(sigma2BC);title('sigma2B en C')
 
-[Iseg3,sep3] = otsu(I,2);
-% [Iseg2,sep2] = otsu(I,2);
-% figure; imshow([I Iseg3;Iseg2 zeros(size(I))]);
-figure; imshow([I Iseg3]); 
+
+data_outC=load('../c/@build/data_out.txt');
+IsegC=zeros(size(I));
+for i=1:size(I,1)
+    IsegC(i,:)=data_outC((i-1)*size(I,2)+1:i*size(I,2));
+end
+
+[Iseg,sep] = otsu(I,2);
+% figure; imshow([I Iseg;IsegC zeros(size(I))]);
+figure('Name', 'Imagen Original - Imagen segmentada en Matlab - Imagen segmentada en C'); imshow([I Iseg IsegC]);
+% figure; imshow([I Iseg3]); 
