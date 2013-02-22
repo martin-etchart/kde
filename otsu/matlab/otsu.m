@@ -1,4 +1,4 @@
-function [Iseg,sep] = otsu(I,n)
+function [Iseg,sep,thr] = otsu(I,n)
 %OTSU Gray-level image segmentation using Otsu's method.
 %   Iseg = OTSU(I,n) computes a segmented image (Iseg) containing n classes
 %   by means of Otsu's n-thresholding method (Otsu N, A Threshold Selection
@@ -75,9 +75,9 @@ elseif nbins<256
 else
     [histo,pixval] = hist(I(:),256);
 end
-figure; stem(pixval,histo); title('Histograma en MATLAB')
 P = histo/sum(histo);
 clear unI
+
 %% Zeroth- and first-order cumulative moments
 w = cumsum(P);
 mu = cumsum((1:nbins).*P);
@@ -86,7 +86,7 @@ mu = cumsum((1:nbins).*P);
 if n==2
     sigma2B =...
         (mu(end)*w(2:end-1)-mu(2:end-1)).^2./w(2:end-1)./(1-w(2:end-1));
-%     keyboard
+    
     [maxsig,k] = max(sigma2B);
         
     % segmented image
@@ -95,7 +95,9 @@ if n==2
     
     % separability criterion
     sep = maxsig/sum(((1:nbins)-mu(end)).^2.*P);
-%     keyboard
+    
+    thr=pixval(k+1);
+    
 elseif n==3
     w0 = w;
     w2 = fliplr(cumsum(fliplr(P)));
@@ -123,6 +125,8 @@ elseif n==3
     
     % separability criterion
     sep = maxsig/sum(((1:nbins)-mu(end)).^2.*P);
+    
+    thr = [pixval(k1); pixval(k2)];
 
 else
     % Threshold positions are adjusted using a horizontal mass-spring
@@ -147,6 +151,8 @@ else
 
     % separability criterion
     sep = 1-y; 
+    
+    thr=0;
     
 end
 
@@ -185,3 +191,4 @@ for i = 1:n
 end
 
 y = 1-sigma2B/sigma2T; % within the range [0 1]
+
