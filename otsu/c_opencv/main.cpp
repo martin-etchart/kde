@@ -10,6 +10,8 @@
 #include "utils.h"
 #include <math.h>
 #include <vector>
+#include <cv.h>
+#include "highgui.h"
 
 using namespace std;
 
@@ -17,19 +19,32 @@ int otsu(double** Iseg, double** thr, double* data, int xsize, int ysize, int N)
 
 int main(int argc, char** argv)
 {
-    // Read image from text file
-    int xsize;
-    int ysize;
-    double *data = NULL;
-    //        const char * full_fname = "../../pics/trimodal2gaussian.txt";
-    const char * full_fname = "../../pics/peppers.txt";
-    file_read_into_array_doubles_mat(full_fname, &data, &xsize, &ysize);
-    int modes = 3;
+    const char * full_fname = "../../pics/trimodal2gaussian.png";
+    IplImage* img = cvLoadImage(full_fname);
 
+    int xsize = img->width;
+    int ysize = img->height;
+
+    double data [xsize * ysize];
+
+    for (int i = 0; i < ysize; i++)
+	for (int j = 0; j < xsize; j++)
+	{
+	    CvScalar c = cvGet2D(img, i, j);
+	    data[i * ysize + j] = c.val[0] / 255;
+	}
+    
+    cvReleaseImage(&img);
+
+    double_vector_save_to_file("data.txt", xsize*ysize, data);
+
+    int modes = 3;
     double* Iseg;
     Iseg = new double[xsize * ysize];
     double* thr;
+
     otsu(&Iseg, &thr, data, xsize, ysize, modes);
+
     double_vector_save_to_file("data_out.txt", xsize*ysize, Iseg);
 
     if (modes == 3)
@@ -43,6 +58,7 @@ int main(int argc, char** argv)
 	std::cout << "thr = ";
 	double_vector_print(1, thr);
     }
+
 }
 
 int otsu(double** Iseg, double** thr, double* data, int xsize, int ysize, int N)
@@ -87,7 +103,7 @@ int otsu(double** Iseg, double** thr, double* data, int xsize, int ysize, int N)
 	    bins[i] = bins[i - 1] + step;
     }
 
-    // free aca ya puedo liberar la memoria de unI
+    free(unI);
 
     histogram(counts, xsize*ysize, nbins, data, bins);
 
@@ -211,8 +227,6 @@ int otsu(double** Iseg, double** thr, double* data, int xsize, int ysize, int N)
 	for (int i = 1; i < nbins * nbins; i++)
 	{
 	    w1[i] = 1 - w0[i] - w2[i];
-	    //	    if (w1[i] <= 0)
-	    //		w1[i] = NAN;
 	}
 
 	double aux4[nbins * nbins], aux5[nbins * nbins], t1[nbins * nbins], t2[nbins * nbins], t3[nbins * nbins], t4[nbins * nbins], t34[nbins * nbins], t34_aux[nbins * nbins];
@@ -238,8 +252,6 @@ int otsu(double** Iseg, double** thr, double* data, int xsize, int ysize, int N)
 	    sigma2B[i] = t1[i] + t2[i] + t34[i];
 	    if (w1[i] <= 0)
 		sigma2B[i] = 0;
-	    //	    if (isnan(sigma2B[i]))
-	    //		sigma2B[i] = 0;
 	}
 
 	double_vector_save_to_file("sigma2B.txt", nbins*nbins, sigma2B);
@@ -268,12 +280,6 @@ int otsu(double** Iseg, double** thr, double* data, int xsize, int ysize, int N)
 	thr_aux[1] = bins[k2];
 	*thr = thr_aux;
     }
-
-    //    for (int i = 0; i < xsize * ysize; i++)
-    //	if (isnan(data_out[i])){
-    //	    data_out[i] = 0;
-    //	    std::cout<<"La concha de la lora hay un nan"<<std::endl;
-    //	}
 
     *Iseg = data_out;
 

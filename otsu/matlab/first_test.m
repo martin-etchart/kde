@@ -2,8 +2,8 @@ close all
 clear all
 clc
 
-% filename = '../pics/trimodal2gaussian.png';
-filename = 'peppers.png';
+filename = '../pics/trimodal2gaussian.png';
+% filename = 'peppers.png';
 
 I=im2double(rgb2gray(imread(filename)));
 
@@ -12,8 +12,8 @@ jfc_vector_save_simple_mat(I,[filename(1:end-3) 'txt']);
 Ir = jfc_vector_read_simple_mat([filename(1:end-3) 'txt']);
 
 % probando el histograma de c
-cBins=load('../c/@build/cBins.txt');
-cHist=load('../c/@build/cHist.txt');
+cBins=load('../c_opencv/@build/cBins.txt');
+cHist=load('../c_opencv/@build/cHist.txt');
 nbins=length(cBins);
 figure; stem(cBins,cHist,'r'); title('Histograma en C')
 
@@ -49,9 +49,9 @@ figure; stem(cBins,cHist,'r'); title('Histograma en C')
 %     mu2C(i,:)=mu2Caux((i-1)*size(mu2C,2)+1:i*size(mu2C,2));
 % end
 
-thrC=load('../c/@build/thr.txt');
+thrC=load('../c_opencv/@build/thr.txt');
 
-data_outC=load('../c/@build/data_out.txt');
+data_outC=load('../c_opencv/@build/data_out.txt');
 IsegC=zeros(size(I));
 for i=1:size(I,1)
     IsegC(i,:)=data_outC((i-1)*size(I,2)+1:i*size(I,2));
