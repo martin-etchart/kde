@@ -34,8 +34,6 @@ int main(int argc, char** argv)
 			data[i * ysize + j] = c.val[0] / 255;
 		}
 
-	cvReleaseImage(&img);
-
 	double_vector_save_to_file("data.txt", xsize*ysize, data);
 
 	int modes = 3;
@@ -60,5 +58,25 @@ int main(int argc, char** argv)
 		double_vector_print(1, thr);
 	}
 
+	IplImage* img_seg_cv=cvCreateImage(cvGetSize(img),img->depth,1);
+	for (int i = 0; i < ysize; i++)
+		for (int j = 0; j < xsize; j++)
+		{
+
+			CvScalar c;
+			double v=Iseg[i * ysize + j];
+			c.val[0] =v*255;
+			c.val[1] =v*255;
+			c.val[2] =v*255;
+			cvSetAt(img_seg_cv,c, i, j);
+
+		}
+
+	cvSaveImage("out.png",img_seg_cv);
+
+	delete[] Iseg;
+	delete[] data;
+	cvReleaseImage(&img_seg_cv);
+	cvReleaseImage(&img);
 }
 

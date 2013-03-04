@@ -42,4 +42,8 @@ int main(int argc, char** argv)
 		std::cout << "thr = ";
 		double_vector_print(1, thr);
 	}
+
+	delete[] thr;
+	free(data);
+	delete[] Iseg;
 }
