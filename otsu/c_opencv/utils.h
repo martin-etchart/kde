@@ -1,4 +1,4 @@
-/* 
+/*
  * File:   utils.h
  * Author: mat
  *
@@ -24,6 +24,8 @@ int divide_vectors(double* c, double* a, double* b, int N);
 int multiplicate_vectors(double* c, double* a, double* b, int N);
 int vector_max(double* m, int* index, double* v, int N);
 int vector_flip(double* b, double* a, int N);
+
+int otsu(double** Iseg, double** thr, double* data, int xsize, int ysize, int N);
 
 #endif	/* UTILS_H */
 

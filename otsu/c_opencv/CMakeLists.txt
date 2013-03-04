@@ -2,7 +2,7 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 PROJECT(OTSU)
 
-FIND_PACKAGE( OpenCV REQUIRED )
+FIND_PACKAGE( OpenCV )
 
 # Define flags for specific OS building
 IF(UNIX)
@@ -55,11 +55,22 @@ ${OpenCV_LIB_DIR}
 
 SET(Example1_NAME OTSU)
 SET(Example1_SRCS
-  main.cpp
   utils.h
   utils.cpp
 )
 
-add_executable(${Example1_NAME} ${Example1_SRCS})
-target_link_libraries(${Example1_NAME} ${OpenCV_LIBS})
 
+SET(EXECUTABLES 
+  main_c
+)
+
+if(OpenCV_FOUND)
+    MESSAGE("USING OPENCV")
+SET(EXECUTABLES ${EXECUTABLES} main_opencv)
+endif(OpenCV_FOUND)
+
+
+FOREACH( exe ${EXECUTABLES} )
+add_executable(${exe} ${exe}.cpp ${Example1_SRCS})
+target_link_libraries(${exe} ${OpenCV_LIBS})
+ENDFOREACH(exe)
