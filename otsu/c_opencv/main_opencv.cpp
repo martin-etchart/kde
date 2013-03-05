@@ -51,9 +51,7 @@ void otsuN(IplImage* img, IplImage* img_seg, int modes, double **thr)
 			data[i * ysize + j] = c.val[0] / 255;
 		}
 
-
-	double* Iseg;
-	Iseg = new double[xsize * ysize];
+	double* Iseg=new double[xsize * ysize];
 
 	otsu(Iseg, thr, data, xsize, ysize, modes);
 

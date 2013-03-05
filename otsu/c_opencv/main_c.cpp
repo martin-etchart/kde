@@ -15,6 +15,7 @@ using namespace std;
 
 int main(int argc, char** argv)
 {
+	int _verbose=1;
 	// Read image from text file
 	int xsize;
 	int ysize;
@@ -24,23 +25,17 @@ int main(int argc, char** argv)
 	file_read_into_array_doubles_mat(full_fname, &data, &xsize, &ysize);
 	int modes = 3;
 
-	double* Iseg;
-	Iseg = new double[xsize * ysize];
+	double* Iseg = new double[xsize * ysize];
 	double* thr;
 	otsu(Iseg, &thr, data, xsize, ysize, modes);
-	double_vector_save_to_file("data_out.txt", xsize*ysize, Iseg);
 
-	if (modes == 3)
+	if(_verbose)
 	{
-		double_vector_save_to_file("thr.txt", 2, thr);
+		double_vector_save_to_file("data.txt", xsize*ysize, data);
+		double_vector_save_to_file("data_out.txt", xsize*ysize, Iseg);
+		double_vector_save_to_file("thr.txt", modes-1, thr);
 		std::cout << "thr = ";
-		double_vector_print(2, thr);
-	}
-	else
-	{
-		double_vector_save_to_file("thr.txt", 1, thr);
-		std::cout << "thr = ";
-		double_vector_print(1, thr);
+		double_vector_print(modes-1, thr);
 	}
 
 	delete[] thr;
