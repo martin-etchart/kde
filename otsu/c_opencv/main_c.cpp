@@ -7,7 +7,7 @@
 
 #include <cstdlib>
 #include <iostream>
-#include "utils.h"
+#include "otsu.h"
 #include <math.h>
 #include <vector>
 

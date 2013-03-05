@@ -1,4 +1,4 @@
-#include "utils.h"
+#include "otsu.h"
 #include <stdio.h>
 #include <iostream>
 #include <algorithm>

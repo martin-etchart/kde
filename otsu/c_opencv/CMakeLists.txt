@@ -55,8 +55,8 @@ ${OpenCV_LIB_DIR}
 
 SET(Example1_NAME OTSU)
 SET(Example1_SRCS
-  utils.h
-  utils.cpp
+  otsu.h
+  otsu.cpp
 )
 
 
