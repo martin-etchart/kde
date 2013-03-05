@@ -27,5 +27,12 @@ int vector_flip(double* b, double* a, int N);
 
 int otsu(double* data_out, double** thr, double* data, int xsize, int ysize, int N);
 
+#ifdef OTSU_WITH_OPENCV
+#include <cv.h>
+#include <highgui.h>
+void otsuN(IplImage* img, IplImage* img_seg, int modes, double **thr);
+#endif
+
+
 #endif	/* UTILS_H */
 

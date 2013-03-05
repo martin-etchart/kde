@@ -6,6 +6,7 @@
 #include <math.h>
 
 
+
 #ifdef __APPLE__
 #include <malloc/malloc.h>
 #else
@@ -418,3 +419,50 @@ int otsu(double* data_out, double** thr, double* data, int xsize, int ysize, int
 	delete[] sigma2B;
 	return 0;
 }
+
+#ifdef OTSU_WITH_OPENCV
+void otsuN(IplImage* img, IplImage* img_seg, int modes, double **thr)
+{
+	int _verbose=0;
+
+	int xsize = img->width;
+	int ysize = img->height;
+
+	double data [xsize * ysize];
+
+	for (int i = 0; i < ysize; i++)
+		for (int j = 0; j < xsize; j++)
+		{
+			CvScalar c = cvGet2D(img, i, j);
+			data[i * ysize + j] = c.val[0] / 255;
+		}
+
+	double* Iseg=new double[xsize * ysize];
+
+	otsu(Iseg, thr, data, xsize, ysize, modes);
+
+	for (int i = 0; i < ysize; i++)
+		for (int j = 0; j < xsize; j++)
+		{
+		CvScalar c;
+			double v=Iseg[i * ysize + j];
+			c.val[0] =v*255;
+			c.val[1] =v*255;
+			c.val[2] =v*255;
+			cvSetAt(img_seg,c, i, j);
+		}
+
+	if(_verbose)
+	{
+		double_vector_save_to_file("data.txt", xsize*ysize, data);
+		double_vector_save_to_file("data_out.txt", xsize*ysize, Iseg);
+		double_vector_save_to_file("thr.txt", modes-1, *thr);
+		std::cout << "thr = ";
+		double_vector_print(modes-1, *thr);
+	}
+
+	delete[] Iseg;
+	//delete[] data;
+}
+
+#endif
