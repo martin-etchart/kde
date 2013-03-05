@@ -186,10 +186,10 @@ int vector_flip(double* b, double* a, int N)
 
 }
 
-int otsu(double** Iseg, double** thr, double* data, int xsize, int ysize, int N)
+int otsu(double* data_out, double** thr, double* data, int xsize, int ysize, int N)
 {
 	int LEVELS = 256;
-	double data_out[xsize * ysize];
+	//double data_out[xsize * ysize];
 
 	// Unique
 	int unI_size;
@@ -259,7 +259,7 @@ int otsu(double** Iseg, double** thr, double* data, int xsize, int ysize, int N)
 	double_vector_save_to_file("mu.txt", nbins, mu);
 
 	double* w_aux;
-	double* mu_aux;
+	double* mu_aux=NULL;
 	double* aux1;
 	double* aux2;
 	double* sigma2B;
@@ -408,10 +408,13 @@ int otsu(double** Iseg, double** thr, double* data, int xsize, int ysize, int N)
 		*thr = thr_aux;
 	}
 
-	*Iseg = data_out;
+	//*Iseg = data_out;
 	delete[] counts;
 	delete[] aux1;
 	delete[] aux2;
 	delete[] bins;
+	delete[] w_aux;
+	if(mu_aux) delete[] mu_aux;
+	delete[] sigma2B;
 	return 0;
 }

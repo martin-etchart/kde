@@ -15,12 +15,29 @@
 
 using namespace std;
 
-
+void otsuN(IplImage* img, IplImage* img_seg, int modes, double **thr);
 
 int main(int argc, char** argv)
 {
 	const char * full_fname = "../../pics/trimodal2gaussian.png";
 	IplImage* img = cvLoadImage(full_fname);
+
+	int modes = 3;
+	double* thr;
+
+	IplImage* img_seg_cv=cvCreateImage(cvGetSize(img),img->depth,1);
+	otsuN(img, img_seg_cv, modes, &thr);
+
+	cvSaveImage("out.png",img_seg_cv);
+
+
+	cvReleaseImage(&img_seg_cv);
+	cvReleaseImage(&img);
+}
+
+void otsuN(IplImage* img, IplImage* img_seg, int modes, double **thr)
+{
+	int _verbose=0;
 
 	int xsize = img->width;
 	int ysize = img->height;
@@ -34,49 +51,32 @@ int main(int argc, char** argv)
 			data[i * ysize + j] = c.val[0] / 255;
 		}
 
-	double_vector_save_to_file("data.txt", xsize*ysize, data);
 
-	int modes = 3;
 	double* Iseg;
 	Iseg = new double[xsize * ysize];
-	double* thr;
 
-	otsu(&Iseg, &thr, data, xsize, ysize, modes);
+	otsu(Iseg, thr, data, xsize, ysize, modes);
 
-	double_vector_save_to_file("data_out.txt", xsize*ysize, Iseg);
-
-	if (modes == 3)
-	{
-		double_vector_save_to_file("thr.txt", 2, thr);
-		std::cout << "thr = ";
-		double_vector_print(2, thr);
-	}
-	else
-	{
-		double_vector_save_to_file("thr.txt", 1, thr);
-		std::cout << "thr = ";
-		double_vector_print(1, thr);
-	}
-
-	IplImage* img_seg_cv=cvCreateImage(cvGetSize(img),img->depth,1);
 	for (int i = 0; i < ysize; i++)
 		for (int j = 0; j < xsize; j++)
 		{
-
-			CvScalar c;
+		CvScalar c;
 			double v=Iseg[i * ysize + j];
 			c.val[0] =v*255;
 			c.val[1] =v*255;
 			c.val[2] =v*255;
-			cvSetAt(img_seg_cv,c, i, j);
-
+			cvSetAt(img_seg,c, i, j);
 		}
 
-	cvSaveImage("out.png",img_seg_cv);
+	if(_verbose)
+	{
+		double_vector_save_to_file("data.txt", xsize*ysize, data);
+		double_vector_save_to_file("data_out.txt", xsize*ysize, Iseg);
+		double_vector_save_to_file("thr.txt", modes-1, *thr);
+		std::cout << "thr = ";
+		double_vector_print(modes-1, *thr);
+	}
 
 	delete[] Iseg;
-	delete[] data;
-	cvReleaseImage(&img_seg_cv);
-	cvReleaseImage(&img);
+	//delete[] data;
 }
-

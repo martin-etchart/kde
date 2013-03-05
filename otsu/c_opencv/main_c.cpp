@@ -27,7 +27,7 @@ int main(int argc, char** argv)
 	double* Iseg;
 	Iseg = new double[xsize * ysize];
 	double* thr;
-	otsu(&Iseg, &thr, data, xsize, ysize, modes);
+	otsu(Iseg, &thr, data, xsize, ysize, modes);
 	double_vector_save_to_file("data_out.txt", xsize*ysize, Iseg);
 
 	if (modes == 3)
