@@ -77,14 +77,21 @@ int int_vector_save_to_file(char* filename, int l, int* v)
 
 int unique(int l, double* v_in, int* l_out, double** v_out)
 {
-	    std::cout << "Al principio: ";
-	    double_vector_print(l, v_in);
+	int _verbose = 0;
+
 	double v[l];
 	for (int i = 0; i < l; i++)
 		v[i] = v_in[i];
 	std::sort(v, v + l); // Sort
-	    std::cout << "Despues del sort: ";
-	    double_vector_print(l, v);
+
+	if (_verbose)
+	{
+		std::cout << "size: " << l << std::endl;
+		std::cout << "Al principio: ";
+		double_vector_print(l, v_in);
+		std::cout << "Despues del sort: ";
+		double_vector_print(l, v);
+	}
 
 	std::vector<double> vec; // (vector_prueba, vector_prueba+(sizeof(vector_prueba)/sizeof(vector_prueba[0])));
 	for (int j = 0; j < l - 1; j++)
@@ -189,6 +196,8 @@ int vector_flip(double* b, double* a, int N)
 
 int otsu(double* data_out, double** thr, double* data, int xsize, int ysize, int N)
 {
+	int _verbose=0;
+
 	int LEVELS = 256;
 	//double data_out[xsize * ysize];
 
@@ -196,8 +205,12 @@ int otsu(double* data_out, double** thr, double* data, int xsize, int ysize, int
 	int unI_size;
 	double* unI;
 	unique(xsize*ysize, data, &unI_size, &unI);
+
+	if(_verbose>=1)
+	{
 	std::cout << std::endl << "unI_c = ";
 	double_vector_print(unI_size, unI);
+	}
 
 	// Histogram
 	int* counts;
@@ -235,12 +248,15 @@ int otsu(double* data_out, double** thr, double* data, int xsize, int ysize, int
 	histogram(counts, xsize*ysize, nbins, data, bins);
 
 	//  Display vector for matlab comparison
+	if(_verbose)
+	{
 	std::cout << std::endl << "cBins = ";
 	double_vector_print(nbins, bins);
 	double_vector_save_to_file("cBins.txt", nbins, bins);
 	std::cout << std::endl << "cHist = ";
 	int_vector_print(nbins, counts);
 	int_vector_save_to_file("cHist.txt", nbins, counts);
+	}
 
 	double P[nbins];
 	for (int i = 0; i < nbins; i++)
@@ -255,9 +271,12 @@ int otsu(double* data_out, double** thr, double* data, int xsize, int ysize, int
 	cumsum(w, P, nbins);
 	cumsum(mu, Pi, nbins);
 
+	if(_verbose)
+	{
 	double_vector_save_to_file("P.txt", nbins, P);
 	double_vector_save_to_file("w.txt", nbins, w);
 	double_vector_save_to_file("mu.txt", nbins, mu);
+	}
 
 	double* w_aux;
 	double* mu_aux = NULL;
@@ -289,11 +308,15 @@ int otsu(double* data_out, double** thr, double* data, int xsize, int ysize, int
 			aux2[i] = 1 - w_aux[i];
 		divide_vectors(sigma2B, aux1, aux2, nbins - 2);
 
-		double_vector_save_to_file("sigma2B.txt", nbins - 2, sigma2B);
-
 		vector_max(&sigma2Bmax, &ind_sigma2Bmax, sigma2B, nbins - 2);
+		if(_verbose)
+		{
+		double_vector_save_to_file("sigma2B.txt", nbins - 2, sigma2B);
 		std::cout << "Maximo: " << sigma2Bmax << std::endl << "Posicion del maximo: " << ind_sigma2Bmax << std::endl;
 		std::cout << "pixval: " << bins[ind_sigma2Bmax + 1] << std::endl;
+		}
+
+
 
 		for (int i = 0; i < xsize * ysize; i++)
 			if (data[i] <= bins[ind_sigma2Bmax + 1])
@@ -430,15 +453,16 @@ void otsuN(IplImage* img, IplImage* img_seg, int modes, double **thr)
 
 	double data [xsize * ysize];
 
-	if(_verbose)
-		printf("img: %d %d\n",img->nChannels,img->depth);
 
 	for (int i = 0; i < ysize; i++)
 		for (int j = 0; j < xsize; j++)
 		{
 			CvScalar c = cvGet2D(img, i, j);
-			data[i * ysize + j] = c.val[0] / 255.0;
+			data[i * xsize + j] = c.val[0] / 255.0;
 		}
+
+	if(_verbose)
+		printf("img: %d %d %d %d\n",xsize,ysize,img->nChannels,img->depth);
 
 	double* Iseg=new double[xsize * ysize];
 
@@ -448,7 +472,7 @@ void otsuN(IplImage* img, IplImage* img_seg, int modes, double **thr)
 		for (int j = 0; j < xsize; j++)
 		{
 			CvScalar c;
-			double v = Iseg[i * ysize + j];
+			double v = Iseg[i * xsize + j];
 			c.val[0] = v * 255;
 			c.val[1] = v * 255;
 			c.val[2] = v * 255;

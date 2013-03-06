@@ -15,8 +15,7 @@ using namespace std;
 
 int main(int argc, char** argv)
 {
-	//const char * full_fname = "../../pics/trimodal2gaussian.png";
-	const char * full_fname = "./a.pgm";
+	const char * full_fname = "../../pics/trimodal2gaussian.png";
 	IplImage* img = cvLoadImage(full_fname);
 
 	int modes = 3;
