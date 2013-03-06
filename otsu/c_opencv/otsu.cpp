@@ -278,7 +278,7 @@ int otsu(double* data_out, double** thr, double* data, int xsize, int ysize, int
 	double_vector_save_to_file("mu.txt", nbins, mu);
 	}
 
-	double* w_aux;
+	double* w_aux = NULL;
 	double* mu_aux = NULL;
 	double* aux1;
 	double* aux2;
@@ -437,7 +437,7 @@ int otsu(double* data_out, double** thr, double* data, int xsize, int ysize, int
 	delete[] aux1;
 	delete[] aux2;
 	delete[] bins;
-	delete[] w_aux;
+	if (w_aux) delete[] w_aux;
 	if (mu_aux) delete[] mu_aux;
 	delete[] sigma2B;
 	return 0;
