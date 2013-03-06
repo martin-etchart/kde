@@ -77,14 +77,14 @@ int int_vector_save_to_file(char* filename, int l, int* v)
 
 int unique(int l, double* v_in, int* l_out, double** v_out)
 {
-	//    std::cout << "Al principio: ";
-	//    double_vector_print(l, v);
+	    std::cout << "Al principio: ";
+	    double_vector_print(l, v_in);
 	double v[l];
 	for (int i = 0; i < l; i++)
 		v[i] = v_in[i];
 	std::sort(v, v + l); // Sort
-	//    std::cout << "Despues del sort: ";
-	//    double_vector_print(l, v);
+	    std::cout << "Despues del sort: ";
+	    double_vector_print(l, v);
 
 	std::vector<double> vec; // (vector_prueba, vector_prueba+(sizeof(vector_prueba)/sizeof(vector_prueba[0])));
 	for (int j = 0; j < l - 1; j++)
@@ -423,18 +423,21 @@ int otsu(double* data_out, double** thr, double* data, int xsize, int ysize, int
 #ifdef OTSU_WITH_OPENCV
 void otsuN(IplImage* img, IplImage* img_seg, int modes, double **thr)
 {
-	int _verbose=0;
+	int _verbose=1;
 
 	int xsize = img->width;
 	int ysize = img->height;
 
 	double data [xsize * ysize];
 
+	if(_verbose)
+		printf("img: %d %d\n",img->nChannels,img->depth);
+
 	for (int i = 0; i < ysize; i++)
 		for (int j = 0; j < xsize; j++)
 		{
 			CvScalar c = cvGet2D(img, i, j);
-			data[i * ysize + j] = c.val[0] / 255;
+			data[i * ysize + j] = c.val[0] / 255.0;
 		}
 
 	double* Iseg=new double[xsize * ysize];
@@ -444,12 +447,12 @@ void otsuN(IplImage* img, IplImage* img_seg, int modes, double **thr)
 	for (int i = 0; i < ysize; i++)
 		for (int j = 0; j < xsize; j++)
 		{
-		CvScalar c;
-			double v=Iseg[i * ysize + j];
-			c.val[0] =v*255;
-			c.val[1] =v*255;
-			c.val[2] =v*255;
-			cvSetAt(img_seg,c, i, j);
+			CvScalar c;
+			double v = Iseg[i * ysize + j];
+			c.val[0] = v * 255;
+			c.val[1] = v * 255;
+			c.val[2] = v * 255;
+			cvSetAt(img_seg, c, i, j);
 		}
 
 	if(_verbose)
