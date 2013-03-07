@@ -25,12 +25,12 @@ int multiplicate_vectors(double* c, double* a, double* b, int N);
 int vector_max(double* m, int* index, double* v, int N);
 int vector_flip(double* b, double* a, int N);
 
-int otsu(double* data_out, double** thr, double* data, int xsize, int ysize, int N);
+int otsu(double* data_out, double** thr, double* sep, double* data, int xsize, int ysize, int N);
 
 #ifdef OTSU_WITH_OPENCV
 #include <cv.h>
 #include <highgui.h>
-void otsuN(IplImage* img, IplImage* img_seg, int modes, double **thr);
+void otsuN(IplImage* img, IplImage* img_seg, int modes, double **thr, double* sep);
 #endif
 
 

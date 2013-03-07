@@ -194,7 +194,7 @@ int vector_flip(double* b, double* a, int N)
 		b[i] = a[N - 1 - i];
 }
 
-int otsu(double* data_out, double** thr, double* data, int xsize, int ysize, int N)
+int otsu(double* data_out, double** thr, double* sep, double* data, int xsize, int ysize, int N)
 {
 	int _verbose=0;
 
@@ -431,7 +431,19 @@ int otsu(double* data_out, double** thr, double* data, int xsize, int ysize, int
 		thr_aux[1] = bins[k2];
 		*thr = thr_aux;
 	}
-
+	
+	
+	double sep_aux[nbins];
+	double sep_aux_2[nbins];
+	for(int i=0;i<nbins;i++)
+	    sep_aux[i]=i+1-mu[nbins-1];
+	vector_pow(sep_aux_2, sep_aux, 2, nbins);
+	multiplicate_vectors(sep_aux, sep_aux_2, P, nbins);
+	double cumu=0;
+	for (int i=0;i<nbins;i++)
+	    cumu+=sep_aux[i];
+	*sep=sigma2Bmax/cumu;
+	
 	//*Iseg = data_out;
 	delete[] counts;
 	delete[] aux1;
@@ -444,7 +456,7 @@ int otsu(double* data_out, double** thr, double* data, int xsize, int ysize, int
 }
 
 #ifdef OTSU_WITH_OPENCV
-void otsuN(IplImage* img, IplImage* img_seg, int modes, double **thr)
+void otsuN(IplImage* img, IplImage* img_seg, int modes, double **thr, double* sep)
 {
 	int _verbose=1;
 
@@ -466,7 +478,7 @@ void otsuN(IplImage* img, IplImage* img_seg, int modes, double **thr)
 
 	double* Iseg=new double[xsize * ysize];
 
-	otsu(Iseg, thr, data, xsize, ysize, modes);
+	otsu(Iseg, thr, sep, data, xsize, ysize, modes);
 
 	for (int i = 0; i < ysize; i++)
 		for (int j = 0; j < xsize; j++)
@@ -486,6 +498,7 @@ void otsuN(IplImage* img, IplImage* img_seg, int modes, double **thr)
 		double_vector_save_to_file("thr.txt", modes-1, *thr);
 		std::cout << "thr = ";
 		double_vector_print(modes-1, *thr);
+		std::cout<< "Criterio de separabilidad: " << *sep << std::endl;
 	}
 
 	delete[] Iseg;

@@ -20,14 +20,15 @@ int main(int argc, char** argv)
 	int xsize;
 	int ysize;
 	double *data = NULL;
-	//        const char * full_fname = "../../pics/trimodal2gaussian.txt";
-	const char * full_fname = "../../pics/peppers.txt";
+	const char * full_fname = "../../pics/trimodal2gaussian.txt";
+	//const char * full_fname = "../../pics/peppers.txt";
 	file_read_into_array_doubles_mat(full_fname, &data, &xsize, &ysize);
 	int modes = 3;
 
 	double* Iseg = new double[xsize * ysize];
 	double* thr;
-	otsu(Iseg, &thr, data, xsize, ysize, modes);
+	double sep;
+	otsu(Iseg, &thr, &sep, data, xsize, ysize, modes);
 
 	if(_verbose)
 	{
@@ -36,6 +37,7 @@ int main(int argc, char** argv)
 		double_vector_save_to_file("thr.txt", modes-1, thr);
 		std::cout << "thr = ";
 		double_vector_print(modes-1, thr);
+		std::cout<< "Criterio de separabilidad: " << sep << std::endl;
 	}
 
 	delete[] thr;
