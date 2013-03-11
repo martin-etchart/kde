@@ -47,6 +47,7 @@ int double_vector_print(int l, double* v)
 	for (int i = 0; i < l - 1; i++)
 		std::cout << v[i] << ", ";
 	std::cout << v[l - 1] << " ];" << std::endl;
+	return 0;
 }
 
 int int_vector_print(int l, int* v)
@@ -55,6 +56,7 @@ int int_vector_print(int l, int* v)
 	for (int i = 0; i < l - 1; i++)
 		std::cout << v[i] << ", ";
 	std::cout << v[l - 1] << " ];" << std::endl;
+	return 0;
 }
 
 int double_vector_save_to_file(char* filename, int l, double* v)
@@ -64,6 +66,7 @@ int double_vector_save_to_file(char* filename, int l, double* v)
 	for (int i = 0; i < l; i++)
 		fprintf(file, "%lg\n", v[i]);
 	fclose(file);
+	return 0;
 }
 
 int int_vector_save_to_file(char* filename, int l, int* v)
@@ -73,13 +76,14 @@ int int_vector_save_to_file(char* filename, int l, int* v)
 	for (int i = 0; i < l; i++)
 		fprintf(file, "%d\n", v[i]);
 	fclose(file);
+	return 0;
 }
 
 int unique(int l, double* v_in, int* l_out, double** v_out)
 {
 	int _verbose = 0;
 
-	double v[l];
+	double* v=(double*)malloc(l*sizeof(*v));
 	for (int i = 0; i < l; i++)
 		v[i] = v_in[i];
 	std::sort(v, v + l); // Sort
@@ -118,6 +122,7 @@ int unique(int l, double* v_in, int* l_out, double** v_out)
 
 	*v_out = v_aux;
 
+	free(v);
 	return 0;
 }
 
@@ -137,7 +142,7 @@ int histogram(int* counts, int len, int nbins, double* data, double* bins)
 		}
 		counts[ind]++;
 	}
-
+	return 0;
 }
 
 int cumsum(double* b, double* a, int N)
@@ -148,6 +153,7 @@ int cumsum(double* b, double* a, int N)
 	{
 		b[i] = b[i - 1] + a[i];
 	}
+	return 0;
 }
 
 int vector_pow(double* b, double* a, int power, int N)
@@ -155,6 +161,7 @@ int vector_pow(double* b, double* a, int power, int N)
 	/* b = a^power */
 	for (int i = 0; i < N; i++)
 		b[i] = pow(a[i], power);
+	return 0;
 }
 
 int divide_vectors(double* c, double* a, double* b, int N)
@@ -162,6 +169,7 @@ int divide_vectors(double* c, double* a, double* b, int N)
 	/* c = a./b */
 	for (int i = 0; i < N; i++)
 		c[i] = a[i] / b[i];
+	return 0;
 }
 
 int multiplicate_vectors(double* c, double* a, double* b, int N)
@@ -169,6 +177,7 @@ int multiplicate_vectors(double* c, double* a, double* b, int N)
 	/* c = a.*b */
 	for (int i = 0; i < N; i++)
 		c[i] = a[i] * b[i];
+	return 0;
 }
 
 int vector_max(double* m, int* index, double* v, int N)
@@ -181,6 +190,7 @@ int vector_max(double* m, int* index, double* v, int N)
 			*m = v[i];
 			*index = i;
 		}
+		return 0;
 }
 
 int vector_flip(double* b, double* a, int N)
@@ -192,6 +202,7 @@ int vector_flip(double* b, double* a, int N)
 
 	for (int i = 0; i < N; i++)
 		b[i] = a[N - 1 - i];
+	return 0;
 }
 
 int otsu(double* data_out, double** thr, double* sep, double* data, int xsize, int ysize, int N)
@@ -258,12 +269,15 @@ int otsu(double* data_out, double** thr, double* sep, double* data, int xsize, i
 	int_vector_save_to_file("cHist.txt", nbins, counts);
 	}
 
-	double P[nbins];
+	double* P=(double*)malloc(nbins*sizeof(*P));
 	for (int i = 0; i < nbins; i++)
 		P[i] = (double) counts[i] / (xsize * ysize);
 
 	// cumsum
-	double w[nbins], mu[nbins], Pi[nbins];
+	double* w=(double*)malloc(nbins*sizeof(*P));
+	double* mu=(double*)malloc(nbins*sizeof(*P)); 
+	double* Pi=(double*)malloc(nbins*sizeof(*P));
+
 	Pi[0] = P[0];
 	for (int i = 1; i < nbins; i++)
 		Pi[i] = (i + 1) * P[i];
@@ -338,7 +352,13 @@ int otsu(double* data_out, double** thr, double* sep, double* data, int xsize, i
 		aux2 = new double[nbins];
 		sigma2B = new double[nbins * nbins];
 
-		double w0[nbins * nbins], w1[nbins * nbins], w2[nbins * nbins], mu0_aux[nbins], mu2_aux[nbins], mu0[nbins * nbins], mu2[nbins * nbins];
+		double* w0= new double[nbins*nbins];
+		double* w1= new double[nbins*nbins];
+		double* w2= new double[nbins*nbins];
+		double* mu0_aux= new double[nbins];
+		double* mu2_aux= new double[nbins]; 
+		double* mu0= new double[nbins*nbins]; 
+		double* mu2= new double[nbins*nbins];
 
 		vector_flip(aux1, P, nbins);
 		cumsum(aux2, aux1, nbins);
@@ -358,7 +378,7 @@ int otsu(double* data_out, double** thr, double* sep, double* data, int xsize, i
 		vector_flip(aux1, Pi, nbins);
 		cumsum(aux2, aux1, nbins);
 
-		double aux3[nbins];
+		double* aux3=new double[nbins];
 		vector_flip(aux3, P, nbins);
 		cumsum(aux1, aux3, nbins);
 
@@ -380,7 +400,14 @@ int otsu(double* data_out, double** thr, double* sep, double* data, int xsize, i
 			w1[i] = 1 - w0[i] - w2[i];
 		}
 
-		double aux4[nbins * nbins], aux5[nbins * nbins], t1[nbins * nbins], t2[nbins * nbins], t3[nbins * nbins], t4[nbins * nbins], t34[nbins * nbins], t34_aux[nbins * nbins];
+		double* aux4=new double[nbins * nbins];
+		double* aux5=new double[nbins * nbins];
+		double* t1=new double[nbins * nbins];
+		double* t2=new double[nbins * nbins];
+		double* t3=new double[nbins * nbins];
+		double* t4=new double[nbins * nbins];
+		double* t34=new double[nbins * nbins];
+		double* t34_aux=new double[nbins * nbins];
 
 		for (int i = 0; i < nbins * nbins; i++)
 			aux4[i] = mu0[i] - mu[nbins - 1];
@@ -420,7 +447,7 @@ int otsu(double* data_out, double** thr, double* sep, double* data, int xsize, i
 		for (int i = 0; i < xsize * ysize; i++)
 			if (data[i] <= bins[k1])
 				data_out[i] = 0.0;
-			else if (data[i] > bins[k1] & data[i] <= bins[k2])
+			else if ((data[i] > bins[k1]) && (data[i] <= bins[k2]))
 				data_out[i] = 0.5;
 			else
 				data_out[i] = 1.0;
@@ -430,11 +457,28 @@ int otsu(double* data_out, double** thr, double* sep, double* data, int xsize, i
 		thr_aux[0] = bins[k1];
 		thr_aux[1] = bins[k2];
 		*thr = thr_aux;
+
+		delete[] w0;
+		delete[] w1;
+		delete[] w2;
+		delete[] mu0_aux;
+		delete[] mu2_aux; 
+		delete[] mu0; 
+		delete[] mu2;
+		delete[] aux3;
+		delete[] aux4;
+		delete[] aux5;
+		delete[] t1;
+		delete[] t2;
+		delete[] t3;
+		delete[] t4;
+		delete[] t34;
+		delete[] t34_aux;
 	}
 	
 	
-	double sep_aux[nbins];
-	double sep_aux_2[nbins];
+	double* sep_aux=new double[nbins];
+	double* sep_aux_2=new double[nbins];
 	for(int i=0;i<nbins;i++)
 	    sep_aux[i]=i+1-mu[nbins-1];
 	vector_pow(sep_aux_2, sep_aux, 2, nbins);
@@ -452,6 +496,11 @@ int otsu(double* data_out, double** thr, double* sep, double* data, int xsize, i
 	if (w_aux) delete[] w_aux;
 	if (mu_aux) delete[] mu_aux;
 	delete[] sigma2B;
+	delete[] sep_aux;
+	delete[] sep_aux_2;
+	free(w);
+	free(mu);
+	free(Pi);
 	return 0;
 }
 
@@ -463,7 +512,7 @@ void otsuN(IplImage* img, IplImage* img_seg, int modes, double **thr, double* se
 	int xsize = img->width;
 	int ysize = img->height;
 
-	double data [xsize * ysize];
+	double* data=new double[xsize * ysize];
 
 
 	for (int i = 0; i < ysize; i++)
@@ -502,7 +551,7 @@ void otsuN(IplImage* img, IplImage* img_seg, int modes, double **thr, double* se
 	}
 
 	delete[] Iseg;
-	//delete[] data;
+	delete[] data;
 }
 
 #endif
