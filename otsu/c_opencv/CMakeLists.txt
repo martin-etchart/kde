@@ -59,19 +59,21 @@ SET(Example1_SRCS
   otsu.cpp
 )
 
+OPTION(USE_OPENCV "Enable OpenCV" ON)
 
 SET(EXECUTABLES 
   main_c
 )
-
-if(OpenCV_FOUND)
+SET(LIBS )
+if(OpenCV_FOUND AND USE_OPENCV)
     MESSAGE("USING OPENCV")
     ADD_DEFINITIONS(-DOTSU_WITH_OPENCV)
 SET(EXECUTABLES ${EXECUTABLES} main_opencv)
-endif(OpenCV_FOUND)
+SET(LIBS ${LIBS} ${OpenCV_LIBS})
+endif(OpenCV_FOUND AND USE_OPENCV)
 
 
 FOREACH( exe ${EXECUTABLES} )
 add_executable(${exe} ${exe}.cpp ${Example1_SRCS})
-target_link_libraries(${exe} ${OpenCV_LIBS})
+target_link_libraries(${exe} ${LIBS})
 ENDFOREACH(exe)

@@ -316,6 +316,13 @@ int otsu(double* data_out, double** thr, double* sep, double* data, int xsize, i
 			aux1[i] = mu[nbins - 1] * w_aux[i] - mu_aux[i];
 		}
 
+		if(_verbose)
+		{
+			std::cout << std::endl << "saving aux"<<std::endl;
+		double_vector_save_to_file("aux1.txt", nbins - 2, aux1);
+		//double_vector_save_to_file("aux2.txt", nbins - 2, aux2);
+		}
+
 		vector_pow(aux2, aux1, 2, nbins - 2);
 		divide_vectors(aux1, aux2, w_aux, nbins - 2);
 		for (int i = 0; i < nbins - 2; i++)
@@ -325,6 +332,8 @@ int otsu(double* data_out, double** thr, double* sep, double* data, int xsize, i
 		vector_max(&sigma2Bmax, &ind_sigma2Bmax, sigma2B, nbins - 2);
 		if(_verbose)
 		{
+		double_vector_save_to_file("aux1b.txt", nbins - 2, aux1);
+		double_vector_save_to_file("aux2b.txt", nbins - 2, aux2);
 		double_vector_save_to_file("sigma2B.txt", nbins - 2, sigma2B);
 		std::cout << "Maximo: " << sigma2Bmax << std::endl << "Posicion del maximo: " << ind_sigma2Bmax << std::endl;
 		std::cout << "pixval: " << bins[ind_sigma2Bmax + 1] << std::endl;
@@ -395,7 +404,7 @@ int otsu(double* data_out, double** thr, double* sep, double* data, int xsize, i
 		double_vector_save_to_file("mu0.txt", nbins*nbins, mu0);
 		double_vector_save_to_file("mu2.txt", nbins*nbins, mu2);
 
-		for (int i = 1; i < nbins * nbins; i++)
+		for (int i = 0; i < nbins * nbins; i++)
 		{
 			w1[i] = 1 - w0[i] - w2[i];
 		}
@@ -432,8 +441,11 @@ int otsu(double* data_out, double** thr, double* sep, double* data, int xsize, i
 				sigma2B[i] = 0;
 		}
 
+		if(_verbose)
+		{
 		double_vector_save_to_file("sigma2B.txt", nbins*nbins, sigma2B);
-
+		double_vector_save_to_file("sigma2B.txt", nbins*nbins, sigma2B);
+		}
 		vector_max(&sigma2Bmax, &ind_sigma2Bmax, sigma2B, nbins * nbins);
 		std::cout << "Maximo: " << sigma2Bmax << std::endl << "Posicion del maximo: " << ind_sigma2Bmax << std::endl;
 
