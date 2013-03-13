@@ -207,7 +207,7 @@ int vector_flip(double* b, double* a, int N)
 
 int otsu(double* data_out, double** thr, double* sep, double* data, int xsize, int ysize, int N)
 {
-	int _verbose=0;
+	int _verbose=1;
 
 	int LEVELS = 256;
 	//double data_out[xsize * ysize];
